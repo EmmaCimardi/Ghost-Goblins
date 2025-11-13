@@ -1,7 +1,10 @@
 import g2d
 import actor 
-#ARENA 500,350
 
-g2d.draw_image("", (0,0), (0,0))
+#ARENA 500,325
+
+g2d.init_canvas((600,250))
+g2d.draw_image("ghosts-goblins-bg.png", (0,0), (0,0)) #sfondo
+g2d.main_loop()
 
 
