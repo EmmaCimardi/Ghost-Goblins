@@ -1,5 +1,5 @@
 import g2d
-import actor 
+from actor import Actor, Point, Arena
 
 #ARENA 500,325
 
