@@ -37,6 +37,7 @@ def check_collision(a1: Actor, a2: Actor) -> bool:
             x2 <= x1 + w1 and x1 <= x2 + w2)
 
 
+
 class Arena():
     """Gioco 2D generico, con una data dimensione in pixel e una lista di attori.
     """
