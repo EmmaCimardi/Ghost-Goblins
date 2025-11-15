@@ -1,6 +1,8 @@
 import g2d
 from actor import Actor, Point, Arena
+img=False
 
+#Classe arthur
 class Arthur(Actor):
     def __init__(self, pos):
              #pos iniziale art
@@ -23,9 +25,9 @@ class Arthur(Actor):
                 if self._touch == False:
                     self._touch=True
                 else:
-                    self._touch==False
+                    self._touch=False
                     arena.kill(self)
-                    g2d.close_canvas()       
+                    img=True
                     
         keys = g2d.current_keys()  #lista tasti premuti 
         
@@ -66,7 +68,7 @@ class Arthur(Actor):
             return 23,32
     
     def sprite(self):
-        if self._touch == False and self._arrow==1:  #da cavagliere a uomo
+        if self._touch == False and self._arrow==1:  #da cavagliere a uomo verso destra  
             return 128,610 
         elif self._touch == True: return 64,75
         elif self._arrow ==2: return 483,41
@@ -120,10 +122,11 @@ def tick():
             g2d.draw_image("ghosts-goblins.png", a.pos(), a.sprite(), a.size())
         else:
             pass  # g2d.draw_rect(a.pos(), a.size())
-
-    arena.tick(g2d.current_keys()) 
-
-            
+ 
+    if img ==True: 
+        g2d.draw_image("ending.webp", (0,0), (600,600))
+    arena.tick(g2d.current_keys())
+    
 def main():
     #ARENA
     global arena
@@ -142,6 +145,6 @@ def main():
     #CANVAS
     
     g2d.main_loop(tick)
-    
+    img()
 
 main()
