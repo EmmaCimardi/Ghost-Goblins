@@ -1,6 +1,5 @@
 import g2d
 from actor import Actor, Point, Arena
-#ciaoooooooo
 
 class Arthur(Actor):
     def __init__(self, pos):
@@ -12,8 +11,20 @@ class Arthur(Actor):
         self._vy = 0    #velocita verticale
         self._direction = 1 
         self._jumping = False   #stato del salto
+        self._touch= False #num collision
     
     def move(self, arena):
+        
+        #se tocca lo zombie
+        for other in arena.collisions():
+            if isinstance(other, Zombie):
+                if self._touch == False:
+                    self._touch=True
+                else:
+                    self._touch==False
+                    arena.kill(self)
+                
+                    
         keys = g2d.current_keys()  #lista tasti premuti 
         
         if "d" in keys:  # "d", muovi art a destra.
@@ -23,7 +34,6 @@ class Arthur(Actor):
         if "w" in keys and not self._jumping:  # "w", art salta .
             self._vy = -10
             self._jumping = True
-            
         
         # Gravità
         self._vy += 0.5
@@ -31,7 +41,7 @@ class Arthur(Actor):
         
         # collisione con il terreno 
         if self._y > 180: #uguale a self._y
-            self._y = 180 #mofdifica altezza di arthur nel canva
+            self._y = 180 #modifica altezza di arthur nel canva
             self._vy = 0
             self._jumping = False
         
@@ -45,10 +55,16 @@ class Arthur(Actor):
         return (self._x, self._y)
     
     def size(self):
-        return (self._w, self._h)
+        if self._touch == False:
+            return self._h , self._w
+        else:
+            return 23,32
     
     def sprite(self):
-        return 128,610 # x_sprite,y_sprite
+        if self._touch == False:
+            return 128,610 # x_sprite,y_sprite
+        else:
+            return 64,75
 
 #Classe zombie
 
@@ -77,11 +93,9 @@ class Zombie(Actor):
             self._dx = self._speed
         elif self._x + self._dx > arena_w - self._w:
             self._dx = -self._speed
-            
-        
         self._x += self._dx
        
-
+    #draw image
     def pos(self) -> Point:
         return self._x, self._y
 
@@ -107,11 +121,12 @@ def tick():
 def main():
     #ARENA
     global arena
+    
     arena = Arena((600, 260)) #dim arena
     g2d.init_canvas(arena.size()) #creo canvas
     
     #ZOMBIE
-    arena.spawn(Zombie((0,180))) #spawn zombie che vanno da destra a sinistra
+    arena.spawn(Zombie((60,180))) #spawn zombie che vanno da destra a sinistra
      
     #ARTHUR
     arena.spawn(Arthur((0, 150)))
