@@ -10,8 +10,10 @@ class Arthur(Actor):
         self._speed = 3 #velocita orizzontale 
         self._vy = 0    #velocita verticale
         self._direction = 1 
+        
         self._jumping = False   #stato del salto
         self._touch= False #num collision
+        self._arrow= 1 #1 destra, 2 sinistra, 3 saltare
     
     def move(self, arena):
         
@@ -23,17 +25,20 @@ class Arthur(Actor):
                 else:
                     self._touch==False
                     arena.kill(self)
-                
+                    g2d.close_canvas()       
                     
         keys = g2d.current_keys()  #lista tasti premuti 
         
         if "d" in keys:  # "d", muovi art a destra.
             self._x += self._speed
+            self._arrow= 1 # verso destra
         if "a" in keys:  # "a", muovi art a sinistra.
-            self._x -= self._speed
+            self._x -= self._speed 
+            self._arrow= 2  #verso sinistra
         if "w" in keys and not self._jumping:  # "w", art salta .
             self._vy = -10
             self._jumping = True
+            self._arrow= 3 # verso alto
         
         # Gravità
         self._vy += 0.5
@@ -61,10 +66,11 @@ class Arthur(Actor):
             return 23,32
     
     def sprite(self):
-        if self._touch == False:
-            return 128,610 # x_sprite,y_sprite
-        else:
-            return 64,75
+        if self._touch == False and self._arrow==1:  #da cavagliere a uomo
+            return 128,610 
+        elif self._touch == True: return 64,75
+        elif self._arrow ==2: return 483,41
+        elif self._arrow ==3: return 143,131
 
 #Classe zombie
 
