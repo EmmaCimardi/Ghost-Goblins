@@ -3,6 +3,17 @@ from actor import Actor, Point, Arena
 img=False
 global backX #dichiaro bg in tutti metodi dove la uso
 
+#dim background: 3588x327
+global scala1 
+global scala2
+global scala3
+global lago1
+global fineScala
+scala1=715
+scala2=912
+scala3=10
+lago1=1164
+fineScala=1131
 #Classe arthur
 class Arthur(Actor):
 
@@ -15,12 +26,17 @@ class Arthur(Actor):
         self._vy = 0    #velocita verticale
         self._direction = 1 
         
+        
         self._jumping = False   #stato del salto
         self._touch= False #num collision
         self._arrow= 1 #1 destra, 2 sinistra, 3 saltare
+        self._valY=180
+        self._saltato=False
     
     def move(self, arena):
-        global backX
+        global scala1, scala2, scala3, fineScala
+        global lago1, backX
+    
         #se tocca lo zombie
         for other in arena.collisions():
             if isinstance(other, Zombie):
@@ -47,15 +63,30 @@ class Arthur(Actor):
             self._vy = -10
             self._jumping = True
             self._arrow= 3 # verso alto
-        
-        
+            self._saltato=True
+            
         # Gravità
         self._vy += 0.5
         self._y += self._vy
         
+        if self._saltato:
+            if (scala1<= self._x - backX  <= scala1+10 or \
+            scala2<= self._x - backX  <= scala2+10 or \
+                scala3<= self._x - backX  <= fineScala): # tratto speciale
+                self._valY = 100
+                self.saltato=True
+            else:
+                if self._x - backX < 605 or self._x - backX >= fineScala:
+                    self._valY = 180
+                    self._saltato=False
+        else:
+            self._saltato=False
+            self._valY = 180
+
+
         # collisione con il terreno 
-        if self._y > 180: #uguale a self._y
-            self._y = 180 #modifica altezza di arthur nel canva
+        if self._y > self._valY: #uguale a self._y
+            self._y = self._valY #modifica altezza di arthur nel canva
             self._vy = 0
             self._jumping = False
         
