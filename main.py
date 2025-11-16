@@ -1,15 +1,17 @@
 import g2d
 from actor import Actor, Point, Arena
 img=False
+global backX #dichiaro bg in tutti metodi dove la uso
 
 #Classe arthur
 class Arthur(Actor):
+
     def __init__(self, pos):
-             #pos iniziale art
+            
         self._x, self._y = pos    #pos iniziale art
         self._w = 29    #larghezza art
         self._h = 31    #altezza art
-        self._speed = 3 #velocita orizzontale 
+        self._speed = 5 #velocita orizzontale 
         self._vy = 0    #velocita verticale
         self._direction = 1 
         
@@ -18,7 +20,7 @@ class Arthur(Actor):
         self._arrow= 1 #1 destra, 2 sinistra, 3 saltare
     
     def move(self, arena):
-        
+        global backX
         #se tocca lo zombie
         for other in arena.collisions():
             if isinstance(other, Zombie):
@@ -26,7 +28,7 @@ class Arthur(Actor):
                     self._touch=True
                 else:
                     self._touch=False
-                    arena.kill(self)
+                    #arena.kill(self)
                     img=True
                     
         keys = g2d.current_keys()  #lista tasti premuti 
@@ -34,13 +36,18 @@ class Arthur(Actor):
         if "d" in keys:  # "d", muovi art a destra.
             self._x += self._speed
             self._arrow= 1 # verso destra
+            if self._x > 50 and backX > -2900:
+                backX -= 10
         if "a" in keys:  # "a", muovi art a sinistra.
             self._x -= self._speed 
             self._arrow= 2  #verso sinistra
+            if self._x < 50 and backX < 0:
+                backX += 10
         if "w" in keys and not self._jumping:  # "w", art salta .
             self._vy = -10
             self._jumping = True
             self._arrow= 3 # verso alto
+        
         
         # Gravità
         self._vy += 0.5
@@ -112,11 +119,13 @@ class Zombie(Actor):
 
     def sprite(self) -> Point:
         return 653, 62
-    
+ 
 #TICK FUNZIONE
+backX=0
 def tick():
+    global backX
     g2d.clear_canvas() #pulisco sfondo
-    g2d.draw_image("ghosts-goblins-bg.png", (0,0), (0,0)) #creo sfondo
+    g2d.draw_image("ghosts-goblins-bg.png", (backX,0), (0,0)) #creo sfondo
     for a in arena.actors():
         if a.sprite() != None:
             g2d.draw_image("ghosts-goblins.png", a.pos(), a.sprite(), a.size())
@@ -125,6 +134,7 @@ def tick():
  
     if img ==True: 
         g2d.draw_image("ending.webp", (0,0), (600,600))
+    
     arena.tick(g2d.current_keys())
     
 def main():
@@ -142,9 +152,8 @@ def main():
 
     arena.tick(g2d.current_keys())
     
-    #CANVAS
+    #background
     
     g2d.main_loop(tick)
-    img()
 
 main()
