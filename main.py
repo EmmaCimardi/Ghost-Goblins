@@ -4,10 +4,19 @@ img=False
 global backX #dichiaro bg in tutti metodi dove la uso
 
 #dim background: 3588x327
+<<<<<<< HEAD
 global scala1, scala2, scala3, lago1, fineScala, inizioScala
+=======
+global scala1 
+global scala2
+global scala3
+global lago1
+global fineScala
+>>>>>>> 1da3d2409e984175b41e6f61f2835abcd4570eb9
 scala1=715
 scala2=912
 scala3=10
+c = 1 
 lago1=1164
 fineScala=1131
 inizioScala=605
@@ -20,9 +29,10 @@ class Arthur(Actor):
         self._x, self._y = pos    #pos iniziale art
         self._w = 29    #larghezza art
         self._h = 31    #altezza art
-        self._speed = 5 #velocita orizzontale 
+        self._speed = 2 #velocita orizzontale 
         self._vy = 0    #velocita verticale
         self._direction = 1 
+        self._click=False
         
         
         self._jumping = False   #stato del salto
@@ -51,18 +61,23 @@ class Arthur(Actor):
         if "d" in keys:  # "d", muovi art a destra.
             self._x += self._speed
             self._arrow= 1 # verso destra
+            
             if self._x > 50 and backX > -2900:
-                backX -= 10
+                backX -= 2
         if "a" in keys:  # "a", muovi art a sinistra.
             self._x -= self._speed 
             self._arrow= 2  #verso sinistra
+            self._click=True
             if self._x < 50 and backX < 0:
-                backX += 10
+                backX += 2
+        else:
+            self._click = False
         if "w" in keys and not self._jumping:  # "w", art salta .
             self._vy = -10
             self._jumping = True
             self._arrow= 3 # verso alto
             self._saltato=True
+       
             
         # Gravità
         self._vy += 0.5
@@ -108,11 +123,8 @@ class Arthur(Actor):
         if self._touch == False and self._arrow==1:  #da cavagliere a uomo verso destra  
             return 128,610 
         elif self._touch == True: return 64,75
-        
-        elif self._arrow ==2: 
-            return 483,41
-        elif self._arrow ==3: 
-            return 143,131
+        elif self._arrow ==2: return 483,41
+        elif self._arrow ==3: return 143,131
 
 #Classe zombie
 
