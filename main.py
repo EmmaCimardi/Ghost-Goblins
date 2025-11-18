@@ -9,11 +9,17 @@ global scala2
 global scala3
 global lago1
 global fineScala
-global c
+global c, c1
 scala1=715
 scala2=912
+<<<<<<< HEAD
 scala3=1078
 c = 1 
+=======
+scala3=10
+c = 1
+c1 = 1 
+>>>>>>> d1b85d842e41310af543049744a46952e86ccb16
 lago1=1164
 fineScala=1131
 #Classe arthur
@@ -56,10 +62,16 @@ class Arthur(Actor):
         if "d" in keys:  # "d", muovi art a destra.
             self._x += self._speed
             self._arrow= 1 # verso destra
-            
+            self._click=True
             if self._x > 50 and backX > -2900:
                 backX -= 2
+<<<<<<< HEAD
                 
+=======
+        else:
+            self._click=False
+
+>>>>>>> d1b85d842e41310af543049744a46952e86ccb16
         if "a" in keys:  # "a", muovi art a sinistra.
             self._x -= self._speed 
             self._arrow= 2  #verso sinistra
@@ -68,8 +80,13 @@ class Arthur(Actor):
                 backX += 2
         else:
             self._click = False
+<<<<<<< HEAD
             
         if "w" in keys and not self._jumping:  # "w", arthur salta
+=======
+
+        if "w" in keys and not self._jumping:  # "w", art salta .
+>>>>>>> d1b85d842e41310af543049744a46952e86ccb16
             self._vy = -10
             self._jumping = True
             self._arrow= 3 # verso alto
@@ -80,11 +97,16 @@ class Arthur(Actor):
         self._vy += 0.5
         self._y += self._vy
         
+<<<<<<< HEAD
         if self._saltato: #se ha fatto un salto (schiacciato w) entro
             
             if ( scala1<= self._x - backX  <= scala1+5 or scala2<= self._x - backX  <= scala2+5 or 
                 scala3<= self._x - backX  <= fineScala ): # se sono dalle scale salgo
 
+=======
+        if self._saltato:
+            if (scala1<= self._x - backX  <= scala1+10 or scala2<= self._x - backX  <= scala2+10 or scala3<= self._x - backX  <= fineScala): 
+>>>>>>> d1b85d842e41310af543049744a46952e86ccb16
                 self._valY = 100
                 self.saltato=True #rimane ad altezza 100  
             else:
@@ -119,10 +141,37 @@ class Arthur(Actor):
             return 23,32
     
     def sprite(self):
+<<<<<<< HEAD
         
         if self._touch == False: #se NON ha toccato un nemico 
             if self._arrow == 1:  
                 return 128,610 
+=======
+        if self._touch == False:
+            
+            if self._arrow == 1: 
+                if self._click:  # SOLO se stai premendo "a"
+                    global c1
+                    match c1:
+                        case 1:
+                            c1 += 1
+                            self._w = 25
+                            self._h = 30
+                            return 38, 42
+                        case 2:
+                            c1 += 1
+                            self._w = 23
+                            self._h = 33
+                            return 86, 42
+                        case 3:
+                            c1 = 1
+                            self._w = 30
+                            self._h = 30
+                            return 107, 42
+                else: 
+                    return 4,39  # Immagine statica
+                    
+>>>>>>> d1b85d842e41310af543049744a46952e86ccb16
             
             if self._arrow == 2: 
                 if self._click:  # SOLO se stai premendo "a"
