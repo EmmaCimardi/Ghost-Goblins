@@ -12,7 +12,7 @@ global fineScala
 global c
 scala1=715
 scala2=912
-scala3=10
+scala3=1078
 c = 1 
 lago1=1164
 fineScala=1131
@@ -27,18 +27,18 @@ class Arthur(Actor):
         self._speed = 2 #velocita orizzontale 
         self._vy = 0    #velocita verticale
         self._direction = 1 
-        self._click=False
+        self._click=False #se a,w o d sono stati cliccati
         
         
         self._jumping = False   #stato del salto
-        self._touch= False #num collision
+        self._touch= False #se è nudo
         self._arrow= 1 #1 destra, 2 sinistra, 3 saltare
-        self._valY=180
-        self._saltato=False
+        self._valY=180 #distanza da terra (y=180)
+        self._saltato=False #ha saltato?
     
     def move(self, arena):
         global scala1, scala2, scala3, fineScala
-        global lago1, backX
+        global lago1, backX #richiamo le global 
     
         #se tocca lo zombie
         for other in arena.collisions():
@@ -48,9 +48,10 @@ class Arthur(Actor):
                 else:
                     self._touch=False
                     #arena.kill(self)
-                    img=True
-                    
+                   
         keys = g2d.current_keys()  #lista tasti premuti 
+        
+        #se premo un tasto:
         
         if "d" in keys:  # "d", muovi art a destra.
             self._x += self._speed
@@ -58,6 +59,7 @@ class Arthur(Actor):
             
             if self._x > 50 and backX > -2900:
                 backX -= 2
+                
         if "a" in keys:  # "a", muovi art a sinistra.
             self._x -= self._speed 
             self._arrow= 2  #verso sinistra
@@ -66,7 +68,8 @@ class Arthur(Actor):
                 backX += 2
         else:
             self._click = False
-        if "w" in keys and not self._jumping:  # "w", art salta .
+            
+        if "w" in keys and not self._jumping:  # "w", arthur salta
             self._vy = -10
             self._jumping = True
             self._arrow= 3 # verso alto
@@ -77,14 +80,16 @@ class Arthur(Actor):
         self._vy += 0.5
         self._y += self._vy
         
-        if self._saltato:
-            if (scala1<= self._x - backX  <= scala1+10 or \
-            scala2<= self._x - backX  <= scala2+10 or \
-                scala3<= self._x - backX  <= fineScala): # tratto speciale
+        if self._saltato: #se ha fatto un salto (schiacciato w) entro
+            
+            if ( scala1<= self._x - backX  <= scala1+5 or scala2<= self._x - backX  <= scala2+5 or 
+                scala3<= self._x - backX  <= fineScala ): # se sono dalle scale salgo
+
                 self._valY = 100
-                self.saltato=True
+                self.saltato=True #rimane ad altezza 100  
             else:
-                if self._x - backX < 605 or self._x - backX >= fineScala:
+                
+                if self._x - backX <= 605 or self._x - backX >= fineScala: #se ha superato il pezzo di terra, o è sesco vado ad altezza 180
                     self._valY = 180
                     self._saltato=False
         else:
@@ -114,7 +119,8 @@ class Arthur(Actor):
             return 23,32
     
     def sprite(self):
-        if self._touch == False:
+        
+        if self._touch == False: #se NON ha toccato un nemico 
             if self._arrow == 1:  
                 return 128,610 
             
@@ -138,8 +144,9 @@ class Arthur(Actor):
                             self._h = 34
                             return 378, 42
                 else:  # arrow=2 ma NON stai premendo "a"
-                    return 482, 43  # Immagine statica!
-                    
+                    return 482, 43 
+            if self._arrow == 3:
+                return 148,131       
         else: 
             return 64,75
 
