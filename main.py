@@ -9,9 +9,11 @@ global scala2
 global scala3
 global lago1
 global fineScala
+global c
 scala1=715
 scala2=912
 scala3=10
+c = 1 
 lago1=1164
 fineScala=1131
 #Classe arthur
@@ -22,9 +24,10 @@ class Arthur(Actor):
         self._x, self._y = pos    #pos iniziale art
         self._w = 29    #larghezza art
         self._h = 31    #altezza art
-        self._speed = 5 #velocita orizzontale 
+        self._speed = 2 #velocita orizzontale 
         self._vy = 0    #velocita verticale
         self._direction = 1 
+        self._click=False
         
         
         self._jumping = False   #stato del salto
@@ -52,18 +55,23 @@ class Arthur(Actor):
         if "d" in keys:  # "d", muovi art a destra.
             self._x += self._speed
             self._arrow= 1 # verso destra
+            
             if self._x > 50 and backX > -2900:
-                backX -= 10
+                backX -= 2
         if "a" in keys:  # "a", muovi art a sinistra.
             self._x -= self._speed 
             self._arrow= 2  #verso sinistra
+            self._click=True
             if self._x < 50 and backX < 0:
-                backX += 10
+                backX += 2
+        else:
+            self._click = False
         if "w" in keys and not self._jumping:  # "w", art salta .
             self._vy = -10
             self._jumping = True
             self._arrow= 3 # verso alto
             self._saltato=True
+       
             
         # Gravità
         self._vy += 0.5
@@ -106,11 +114,34 @@ class Arthur(Actor):
             return 23,32
     
     def sprite(self):
-        if self._touch == False and self._arrow==1:  #da cavagliere a uomo verso destra  
-            return 128,610 
-        elif self._touch == True: return 64,75
-        elif self._arrow ==2: return 483,41
-        elif self._arrow ==3: return 143,131
+        if self._touch == False:
+            if self._arrow == 1:  
+                return 128,610 
+            
+            if self._arrow == 2: 
+                if self._click:  # SOLO se stai premendo "a"
+                    global c
+                    match c:
+                        case 1:
+                            c += 1
+                            self._w = 22
+                            self._h = 34
+                            return 447, 42
+                        case 2:
+                            c += 1
+                            self._w = 24
+                            self._h = 34
+                            return 404, 42
+                        case 3:
+                            c = 1
+                            self._w = 28
+                            self._h = 34
+                            return 378, 42
+                else:  # arrow=2 ma NON stai premendo "a"
+                    return 482, 43  # Immagine statica!
+                    
+        else: 
+            return 64,75
 
 #Classe zombie
 
