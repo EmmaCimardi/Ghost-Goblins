@@ -4,23 +4,18 @@ img=False
 global backX #dichiaro bg in tutti metodi dove la uso
 
 #dim background: 3588x327
-<<<<<<< HEAD
-global scala1, scala2, scala3, lago1, fineScala, inizioScala
-=======
 global scala1 
 global scala2
 global scala3
 global lago1
 global fineScala
->>>>>>> 1da3d2409e984175b41e6f61f2835abcd4570eb9
+global c
 scala1=715
 scala2=912
 scala3=10
 c = 1 
 lago1=1164
 fineScala=1131
-inizioScala=605
-
 #Classe arthur
 class Arthur(Actor):
 
@@ -37,14 +32,13 @@ class Arthur(Actor):
         
         self._jumping = False   #stato del salto
         self._touch= False #num collision
-        self._arrow= 1 #1 destra, 2 sinistra, salire le scale
-        
+        self._arrow= 1 #1 destra, 2 sinistra, 3 saltare
         self._valY=180
         self._saltato=False
     
     def move(self, arena):
         global scala1, scala2, scala3, fineScala
-        global lago1, backX, inizioScala
+        global lago1, backX
     
         #se tocca lo zombie
         for other in arena.collisions():
@@ -90,7 +84,7 @@ class Arthur(Actor):
                 self._valY = 100
                 self.saltato=True
             else:
-                if self._x - backX <= 605 or self._x - backX >= fineScala:
+                if self._x - backX < 605 or self._x - backX >= fineScala:
                     self._valY = 180
                     self._saltato=False
         else:
@@ -120,11 +114,34 @@ class Arthur(Actor):
             return 23,32
     
     def sprite(self):
-        if self._touch == False and self._arrow==1:  #da cavagliere a uomo verso destra  
-            return 128,610 
-        elif self._touch == True: return 64,75
-        elif self._arrow ==2: return 483,41
-        elif self._arrow ==3: return 143,131
+        if self._touch == False:
+            if self._arrow == 1:  
+                return 128,610 
+            
+            if self._arrow == 2: 
+                if self._click:  # SOLO se stai premendo "a"
+                    global c
+                    match c:
+                        case 1:
+                            c += 1
+                            self._w = 22
+                            self._h = 34
+                            return 447, 42
+                        case 2:
+                            c += 1
+                            self._w = 24
+                            self._h = 34
+                            return 404, 42
+                        case 3:
+                            c = 1
+                            self._w = 28
+                            self._h = 34
+                            return 378, 42
+                else:  # arrow=2 ma NON stai premendo "a"
+                    return 482, 43  # Immagine statica!
+                    
+        else: 
+            return 64,75
 
 #Classe zombie
 
