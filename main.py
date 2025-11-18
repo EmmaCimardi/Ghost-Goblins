@@ -4,11 +4,7 @@ img=False
 global backX #dichiaro bg in tutti metodi dove la uso
 
 #dim background: 3588x327
-global scala1 
-global scala2
-global scala3
-global lago1
-global fineScala
+global scala1, scala2, scala3, lago1, fineScala
 scala1=715
 scala2=912
 scala3=10
@@ -29,7 +25,7 @@ class Arthur(Actor):
         
         self._jumping = False   #stato del salto
         self._touch= False #num collision
-        self._arrow= 1 #1 destra, 2 sinistra, 3 saltare
+        self._arrow= 1 #1 destra, 2 sinistra, salire le scale
         self._valY=180
         self._saltato=False
     
@@ -109,8 +105,11 @@ class Arthur(Actor):
         if self._touch == False and self._arrow==1:  #da cavagliere a uomo verso destra  
             return 128,610 
         elif self._touch == True: return 64,75
-        elif self._arrow ==2: return 483,41
-        elif self._arrow ==3: return 143,131
+        
+        elif self._arrow ==2: 
+            return 483,41
+        elif self._arrow ==3: 
+            return 143,131
 
 #Classe zombie
 
