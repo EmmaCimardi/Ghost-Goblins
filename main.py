@@ -4,12 +4,14 @@ img=False
 global backX #dichiaro bg in tutti metodi dove la uso
 
 #dim background: 3588x327
-global scala1, scala2, scala3, lago1, fineScala
+global scala1, scala2, scala3, lago1, fineScala, inizioScala
 scala1=715
 scala2=912
 scala3=10
 lago1=1164
 fineScala=1131
+inizioScala=605
+
 #Classe arthur
 class Arthur(Actor):
 
@@ -26,12 +28,13 @@ class Arthur(Actor):
         self._jumping = False   #stato del salto
         self._touch= False #num collision
         self._arrow= 1 #1 destra, 2 sinistra, salire le scale
+        
         self._valY=180
         self._saltato=False
     
     def move(self, arena):
         global scala1, scala2, scala3, fineScala
-        global lago1, backX
+        global lago1, backX, inizioScala
     
         #se tocca lo zombie
         for other in arena.collisions():
@@ -72,7 +75,7 @@ class Arthur(Actor):
                 self._valY = 100
                 self.saltato=True
             else:
-                if self._x - backX < 605 or self._x - backX >= fineScala:
+                if self._x - backX <= 605 or self._x - backX >= fineScala:
                     self._valY = 180
                     self._saltato=False
         else:
