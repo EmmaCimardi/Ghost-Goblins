@@ -57,7 +57,8 @@ class Arthur(Actor):
                     self._touch = True
                 else:
                     self._touch = False
-
+            if isinstance(other, Platform):
+                self._y = 100 #se tocco la platform salendo le scale poi arthur cammina su y=100
         keys = g2d.current_keys()
 
         
@@ -94,6 +95,9 @@ class Arthur(Actor):
             self._jumping = True
             self._arrow = 3
             self._saltato = True
+            
+        if "Space" in keys:
+            arena.spawn(Torch(self._x+10, self._y))
 
         # Gravità 
         self._vy += 0.5
@@ -163,7 +167,6 @@ class Arthur(Actor):
             # se ha toccato nemici
             return 64, 75
     
-
 class Zombie(Actor):
     
     global contaTick, backX, x_arthur #var globali
@@ -216,6 +219,52 @@ class Zombie(Actor):
         
         return 653, 62
 
+class Platform(Actor):
+
+    def __init__(self, pos, w, h):
+        self._x, self._y = pos
+        self._w, self._h = w, h
+                
+    def move(self, arena):
+        self._x=self._x
+    def pos(self) -> Point:
+        return self._x, self._y
+
+    def size(self) -> Point:
+        return self._w, self._h
+
+    def sprite(self) -> Point:
+        return None
+
+class Torch(Actor):
+    def __init__(self, pos):
+        self._x, self._y = pos 
+        self._w, self._h = 15, 15
+        self._speed = 4
+        self._dx, self._dy = self._speed, self._speed
+
+    def move(self, arena: Arena):
+        self._x += self._dx #ad ogni tick la fiaccola va
+        for other in arena.collisions():
+            if isinstance(other, Zombie):
+                arena.kill(other) #se tocca uno zombie questo muore 
+                arena.kill(self)
+        
+        
+        #if self._y + self._dy > arena_h - self._h:
+            #flame spawn
+    def pos(self) -> Point:
+        return self._x, self._y
+
+    def size(self) -> Point:
+        return self._w, self._h
+
+    def sprite(self) -> Point:
+        return 130,334
+
+
+#class Flame(Actor): 
+    
 #TICK FUNZIONE
 backX=0 #movimento dello sfondo
 def tick():
@@ -259,7 +308,13 @@ def main():
     arena.spawn(Arthur((0, 180))) #spawn arthur sul terreno
 
     #ZOMBIE spawn nel tick!!
-        
+    
+    #Piattaforme
+    arena.spawn(Platform((597, 122),121,16 )) #primo spigolo di terra(sinistra della scala1)
+    arena.spawn(Platform((738, 121), 173,16))
+    arena.spawn(Platform((927, 123), 148,16))
+    arena.spawn(Platform((1088, 125), 47,16))
+    
      
     
     
