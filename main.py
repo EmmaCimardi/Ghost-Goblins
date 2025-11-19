@@ -194,15 +194,15 @@ class Zombie(Actor):
             self._x += self._dx        
             if self._x < 0:
                 self._x = 0
-                self._dir = True 
+                self._dx = self._speed 
             elif self._x + self._w > arena_w:
                 self._x = arena_w - self._w
-                self._dir = False 
+                self._x = -self._speed
             #farlo morire dopo 100 tick
             #contatick è quello "aggiornato" mentre self._ct è il secondo in cui è stato generato lo zombie
             if contaTick - self._ct >= 50:
                 self._die = True #cambio immagine e metto zombie che va a terra
-                self._dx = 0 #fermo
+                #self._dx = 0 #fermo
                 arena.kill(self)
         
 
@@ -237,13 +237,13 @@ def tick():
     #spawn zoombie 
     zX= random.randrange(60,600) #la x di zombie è casuale [60,550[
     d = random.choice([True, False])#destra(true) o sinistra(false)
-    prob = random.randrange(0,5) #ho una probabilita su 1500 che nasca uno zombie (metto 1/10 per vederli)
+    prob = random.randrange(0,20) #ho una probabilita su 1500 che nasca uno zombie (metto 1/10 per vederli)
     distanza= x_arthur - zX #devo calcolare la distanza tra arthur e gli zombie, se lo zombie è vicino di 200
     if distanza <=0 : 
         distanza = distanza*(-1) #distanza deve essere positiva, minore o maggiore di 200
-    if distanza <= 200: #se quidi la distanza tra arthur e zombie è <= 200 procedo
-        if prob==1: 
-            arena.spawn(Zombie((zX,210), contaTick, d)) #spawn zombie che vanno da destra a sinistra    
+   # if distanza <= 500: #se quidi la distanza tra arthur e zombie è <= 200 procedo
+    if prob==1: 
+        arena.spawn(Zombie((zX,210), contaTick, d)) #spawn zombie che vanno da destra a sinistra    
     #passo per parametro: (x casuale,y), secondo in cui viene generato, destra/sinistra
     
 def main():
