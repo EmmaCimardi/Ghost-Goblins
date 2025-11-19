@@ -1,7 +1,5 @@
 import g2d
 from actor import Actor, Point, Arena
-img=False
-global backX #dichiaro bg in tutti metodi dove la uso
 
 #dim background: 3588x327
 global contaTick
@@ -21,160 +19,147 @@ contaTick=0
 #Classe arthur
 class Arthur(Actor):
 
+
+sheet = "ghosts-goblins.png"
+
+# coordinate della corsa (x, y, w, h)
+frames_run = [
+    (39, 43, 23, 30),
+    (63, 41, 23, 33),
+    (86, 41, 22, 34),
+    (108, 42, 27, 31)
+]
+
+class Arthur(Actor):
     def __init__(self, pos):
-            
-        self._x, self._y = pos    #pos iniziale art
-        self._w = 29    #larghezza art
-        self._h = 31    #altezza art
-        self._speed = 2 #velocita orizzontale 
-        self._vy = 0    #velocita verticale
-        self._direction = 1 
-        self._click=False #se a,w o d sono stati cliccati
-        
-        
-        self._jumping = False   #stato del salto
-        self._touch= False #se è nudo
-        self._arrow= 1 #1 destra, 2 sinistra, 3 saltare
-        self._valY=180 #distanza da terra (y=180)
-        self._saltato=False #ha saltato?
-    
+        self._x, self._y = pos
+        self._w = 29
+        self._h = 31
+        self._speed = 2
+        self._vy = 0
+        self._direction = 1
+        self._click = False
+        self._jumping = False
+        self._touch = False
+        self._arrow = 1
+        self._valY = 180
+        self._saltato = False
+        ####
+        self._frame = 0
+        self._animation_speed = 4
+        self._animation_counter = 0
+
     def move(self, arena):
-        global scala1, scala2, scala3, fineScala
-        global lago1, backX #richiamo le global 
-    
-        #se tocca lo zombie
+        global scala1, scala2, scala3, fineScala, lago1, backX
+
         for other in arena.collisions():
             if isinstance(other, Zombie):
                 if self._touch == False:
-                    self._touch=True
+                    self._touch = True
                 else:
-                    self._touch=False
-                    #arena.kill(self)
-                   
-        keys = g2d.current_keys()  #lista tasti premuti 
+                    self._touch = False
+
+        keys = g2d.current_keys()
+
         
-        #se premo un tasto:
+        moved = False
         
-        if "d" in keys:  # "d", muovi art a destra.
+        if "ArrowRight" in keys:  # freccia destra
             self._x += self._speed
-            self._arrow= 1 # verso destra
-            self._click=True
+            self._arrow = 1
+            self._click = True
+            moved = True
             if self._x > 50 and backX > -2900:
                 backX -= 2
-        else:
-            self._click=False
 
-        if "a" in keys:  # "a", muovi art a sinistra.
-            self._x -= self._speed 
-            self._arrow= 2  #verso sinistra
-            self._click=True
+        elif "ArrowLeft" in keys:  # freccia sinistra
+            self._x -= self._speed
+            self._arrow = 2
+            self._click = True
+            moved = True
             if self._x < 50 and backX < 0:
                 backX += 2
         else:
             self._click = False
-            
-        if "w" in keys and not self._jumping:  # "w", arthur salta
+
+       #corsa 
+        if moved:
+            self._animation_counter += 1
+            if self._animation_counter >= self._animation_speed:
+                self._frame = (self._frame + 1) % len(frames_run)
+                self._animation_counter = 0
+
+        # salto
+        if "ArrowUp" in keys and not self._jumping:
             self._vy = -10
             self._jumping = True
-            self._arrow= 3 # verso alto
-            self._saltato=True
-       
-            
-        # Gravità
+            self._arrow = 3
+            self._saltato = True
+
+        # Gravità 
         self._vy += 0.5
         self._y += self._vy
-        
-        if self._saltato: #se ha fatto un salto (schiacciato w) entro
-            
-            if ( scala1<= self._x - backX  <= scala1+10 or scala2<= self._x - backX  <= scala2+10 or 
-                scala3<= self._x - backX  <= scala3 +10 ): # se sono dalle scale salgo
 
+        # scale
+        if self._saltato:
+            if (scala1 <= self._x - backX <= scala1+10 or 
+                scala2 <= self._x - backX <= scala2+10 or 
+                scala3 <= self._x - backX <= scala3 + 10):
                 self._valY = 100
-                self._saltato=True #rimane ad altezza 100  
+                self.saltato = True
             else:
-                
-                if self._x - backX <= 605 or self._x - backX >= fineScala: #se ha superato il pezzo di terra, o è sesco vado ad altezza 180
+                if self._x - backX <= 605 or self._x - backX >= fineScala:
                     self._valY = 180
-                    self._saltato=False
+                    self._saltato = False
         else:
-            self._saltato=False
+            self._saltato = False
             self._valY = 180
 
-
-        # collisione con il terreno 
-        if self._y > self._valY: #uguale a self._y
-            self._y = self._valY #modifica altezza di arthur nel canva
+        # collisione con terreno
+        if self._y > self._valY:
+            self._y = self._valY
             self._vy = 0
             self._jumping = False
-        
-        # controllo dei bordi dello schermo
+
+        # controllo bordi
         if self._x < 0:
             self._x = 0
         if self._x > 600 - self._w:
             self._x = 600 - self._w
-    
+
     def pos(self):
         return (self._x, self._y)
-    
+
     def size(self):
         if self._touch == False:
-            return self._h , self._w
+            return self._w, self._h
         else:
             return 23,32
-    
-    def sprite(self):
-        if self._touch == False:
-            
-            if self._arrow == 1: 
-                if self._click:  # SOLO se stai premendo "a"
-                    global c1
-                    match c1:
-                        case 1:
-                            c1 += 1
-                            self._w = 25
-                            self._h = 30
-                            return 38, 42
-                        case 2:
-                            c1 += 1
-                            self._w = 23
-                            self._h = 33
-                            return 86, 42
-                        case 3:
-                            c1 = 1
-                            self._w = 30
-                            self._h = 30
-                            return 107, 42
-                else: 
-                    return 4,39  # Immagine statica
-                    
-            
-            if self._arrow == 2: 
-                if self._click:  # SOLO se stai premendo "a"
-                    global c
-                    match c:
-                        case 1:
-                            c += 1
-                            self._w = 22
-                            self._h = 34
-                            return 447, 42
-                        case 2:
-                            c += 1
-                            self._w = 24
-                            self._h = 34
-                            return 404, 42
-                        case 3:
-                            c = 1
-                            self._w = 28
-                            self._h = 34
-                            return 378, 42
-                else:  # arrow=2 ma NON stai premendo "a"
-                    return 482, 43 
-            if self._arrow == 3:
-                return 148,131       
-        else: 
-            return 64,75
 
-#Classe zombie
+    def sprite(self):
+        # se non ha toccato nemici
+        if self._touch == False:
+            # se si muove
+            if self._click and not self._jumping:
+                sx, sy, w, h = frames_run[self._frame]
+                # aggiorno dim 
+                self._w, self._h = w, h
+                return sx, sy
+            # salto
+            elif self._jumping:
+                self._w, self._h = 32, 32   #da cambiare 
+                return 148, 131  #da cambiare 
+            # se è fermo
+            else:
+                if self._arrow == 1:  # destra
+                    self._w, self._h = 29, 31 
+                    return 4, 39  
+                else:  # sinistra
+                    self._w, self._h = 29, 31 
+                    return 482, 43
+        else:
+            # se ha toccato nemici
+            return 64, 75
 
 class Zombie(Actor):
     
@@ -256,7 +241,6 @@ def tick():
 
     
 def main():
-    #ARENA
     global arena
     global contaTick, i 
     arena = Arena((600, 260)) #dim arena
