@@ -168,7 +168,7 @@ class Zombie(Actor):
     
     global contaTick, backX, x_arthur #var globali
     def __init__(self, pos, ct, direzione): #ct è il contatick in cui è stato generato
-        self._x, self._y = pos
+        self._x, self._y = pos #y=210
         self._w, self._h = 22, 36
         self._speed = 4
         self._dx =self._speed
@@ -178,26 +178,33 @@ class Zombie(Actor):
         
     def move(self, arena):
              
-        if x_arthur > self._x: #se la posizione di arthur>di zombi allora si gira a destra "verso arthr"
-            self._dx = self._speed #d
-        else:
-            self._dx= -self._speed#s
+        #sorge dal terreno, 210-180=30/10=3, in 3 tick sale
+    
+        if self._y> 180:
+            self._y -= 10
             
-        arena_w, arena_h = arena.size()
-        self._x += self._dx        
-        if self._x < 0:
-            self._x = 0
-            self._dir = True 
-        elif self._x + self._w > arena_w:
-            self._x = arena_w - self._w
-            self._dir = False 
-
-       
-    #farlo morire ogni 100 tick
-    #contatick è quello "aggiornato" mentre self._ct è il secondo in cui è stato generato lo zombie
-        if contaTick - self._ct >= 100:
-            self._die = True #cambio immagine e metto zombie che va a terra
-            arena.kill(self)
+        if self._y <= 180:
+            
+            if x_arthur > self._x: #se la posizione di arthur>di zombi allora si gira a destra "verso arthr"
+                self._dx = self._speed #d
+            else:
+                self._dx= -self._speed#s
+                
+            arena_w, arena_h = arena.size()
+            self._x += self._dx        
+            if self._x < 0:
+                self._x = 0
+                self._dir = True 
+            elif self._x + self._w > arena_w:
+                self._x = arena_w - self._w
+                self._dir = False 
+            #farlo morire dopo 100 tick
+            #contatick è quello "aggiornato" mentre self._ct è il secondo in cui è stato generato lo zombie
+            if contaTick - self._ct >= 50:
+                self._die = True #cambio immagine e metto zombie che va a terra
+                self._dx = 0 #fermo
+                arena.kill(self)
+        
 
     def pos(self) -> Point:
         return self._x, self._y
@@ -206,12 +213,8 @@ class Zombie(Actor):
         return self._w, self._h
 
     def sprite(self) -> Point:
-        if self._die: 
-            self._h=15
-            self._w=31
-            return 529,83
-        else:
-            return 653, 62
+        
+        return 653, 62
 
 #TICK FUNZIONE
 backX=0 #movimento dello sfondo
@@ -232,15 +235,15 @@ def tick():
      
     arena.tick(k)        
     #spawn zoombie 
-    zX= random.randrange(0,601) #la x di zombie è casuale [0,601[
+    zX= random.randrange(60,600) #la x di zombie è casuale [60,550[
     d = random.choice([True, False])#destra(true) o sinistra(false)
-    prob = random.randrange(0,1500) #ho una probabilita su 1500 che nasca uno zombie
+    prob = random.randrange(0,5) #ho una probabilita su 1500 che nasca uno zombie (metto 1/10 per vederli)
     distanza= x_arthur - zX #devo calcolare la distanza tra arthur e gli zombie, se lo zombie è vicino di 200
     if distanza <=0 : 
         distanza = distanza*(-1) #distanza deve essere positiva, minore o maggiore di 200
     if distanza <= 200: #se quidi la distanza tra arthur e zombie è <= 200 procedo
-        if prob==1 and zX: 
-            arena.spawn(Zombie((zX,180), contaTick, d)) #spawn zombie che vanno da destra a sinistra    
+        if prob==1: 
+            arena.spawn(Zombie((zX,210), contaTick, d)) #spawn zombie che vanno da destra a sinistra    
     #passo per parametro: (x casuale,y), secondo in cui viene generato, destra/sinistra
     
 def main():
