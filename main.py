@@ -4,24 +4,20 @@ img=False
 global backX #dichiaro bg in tutti metodi dove la uso
 
 #dim background: 3588x327
-global scala1 
-global scala2
-global scala3
+global contaTick
+global scala1, scala2, scala3
 global lago1
 global fineScala
-global c, c1
+global c, c1, i #contatori
 scala1=715
 scala2=912
-<<<<<<< HEAD
-scala3=1078
-c = 1 
-=======
-scala3=10
+scala3=1070
 c = 1
 c1 = 1 
->>>>>>> d1b85d842e41310af543049744a46952e86ccb16
+i=0
 lago1=1164
 fineScala=1131
+contaTick=0
 #Classe arthur
 class Arthur(Actor):
 
@@ -65,13 +61,9 @@ class Arthur(Actor):
             self._click=True
             if self._x > 50 and backX > -2900:
                 backX -= 2
-<<<<<<< HEAD
-                
-=======
         else:
             self._click=False
 
->>>>>>> d1b85d842e41310af543049744a46952e86ccb16
         if "a" in keys:  # "a", muovi art a sinistra.
             self._x -= self._speed 
             self._arrow= 2  #verso sinistra
@@ -80,13 +72,8 @@ class Arthur(Actor):
                 backX += 2
         else:
             self._click = False
-<<<<<<< HEAD
             
         if "w" in keys and not self._jumping:  # "w", arthur salta
-=======
-
-        if "w" in keys and not self._jumping:  # "w", art salta .
->>>>>>> d1b85d842e41310af543049744a46952e86ccb16
             self._vy = -10
             self._jumping = True
             self._arrow= 3 # verso alto
@@ -97,18 +84,13 @@ class Arthur(Actor):
         self._vy += 0.5
         self._y += self._vy
         
-<<<<<<< HEAD
         if self._saltato: #se ha fatto un salto (schiacciato w) entro
             
-            if ( scala1<= self._x - backX  <= scala1+5 or scala2<= self._x - backX  <= scala2+5 or 
-                scala3<= self._x - backX  <= fineScala ): # se sono dalle scale salgo
+            if ( scala1<= self._x - backX  <= scala1+10 or scala2<= self._x - backX  <= scala2+10 or 
+                scala3<= self._x - backX  <= scala3 +10 ): # se sono dalle scale salgo
 
-=======
-        if self._saltato:
-            if (scala1<= self._x - backX  <= scala1+10 or scala2<= self._x - backX  <= scala2+10 or scala3<= self._x - backX  <= fineScala): 
->>>>>>> d1b85d842e41310af543049744a46952e86ccb16
                 self._valY = 100
-                self.saltato=True #rimane ad altezza 100  
+                self._saltato=True #rimane ad altezza 100  
             else:
                 
                 if self._x - backX <= 605 or self._x - backX >= fineScala: #se ha superato il pezzo di terra, o è sesco vado ad altezza 180
@@ -141,12 +123,6 @@ class Arthur(Actor):
             return 23,32
     
     def sprite(self):
-<<<<<<< HEAD
-        
-        if self._touch == False: #se NON ha toccato un nemico 
-            if self._arrow == 1:  
-                return 128,610 
-=======
         if self._touch == False:
             
             if self._arrow == 1: 
@@ -171,7 +147,6 @@ class Arthur(Actor):
                 else: 
                     return 4,39  # Immagine statica
                     
->>>>>>> d1b85d842e41310af543049744a46952e86ccb16
             
             if self._arrow == 2: 
                 if self._click:  # SOLO se stai premendo "a"
@@ -202,33 +177,41 @@ class Arthur(Actor):
 #Classe zombie
 
 class Zombie(Actor):
-    def __init__(self, pos):
+    
+    global contaTick
+    def __init__(self, pos, ct): #ct è il contatick in cui è stato generato
         self._x, self._y = pos
         self._w, self._h = 22, 36
-        self._speed = 2
-        self._dx, self._dy = self._speed, self._speed
+        self._speed = 4
+        self._dx =self._speed
+        self._ct=ct
+        self._die =False #quando muore (ogni 150 sec) sprite cambia e si vede lo combie andarsene 
         
-    def move(self, arena: Arena):
-       
-       #for other in arena.collisions():
-            #if not isinstance(other, ):
-             #   x, y = other.pos()
-              #  if self._x + self._dx < 0:
-               #     self._dx = self._speed
-                #else:
-                 #   self._dx = -self._speed""
-                
+    def move(self, arena):
+        for other in arena.collisions():
+            if not isinstance(other, Arthur):
+                x, y = other.pos()
+                if x < self._x:
+                    self._dx = self._speed
+                else:
+                    self._dx = -self._speed
+             
 
         arena_w, arena_h = arena.size()
-        
-        #sposto lo zombie da destra a sinistra
         if self._x + self._dx < 0:
             self._dx = self._speed
         elif self._x + self._dx > arena_w - self._w:
             self._dx = -self._speed
+     
         self._x += self._dx
        
-    #draw image
+    #farlo morire 
+    
+        if (self._ct+contaTick) % 120 == 0: 
+            arena.kill(self)
+            self._die =True
+       
+
     def pos(self) -> Point:
         return self._x, self._y
 
@@ -236,41 +219,56 @@ class Zombie(Actor):
         return self._w, self._h
 
     def sprite(self) -> Point:
-        return 653, 62
- 
+        if self._die: 
+            self._h=15
+            self._w=31
+            return 529,83
+        else:
+            return 653, 62
+
 #TICK FUNZIONE
 backX=0
 def tick():
-    global backX
-    g2d.clear_canvas() #pulisco sfondo
-    g2d.draw_image("ghosts-goblins-bg.png", (backX,0), (0,0)) #creo sfondo
+    global contaTick
+    global backX, i
+
+    contaTick += 1 #secondi
+    k = g2d.current_keys() #array di tasti dalla keynoard
+    g2d.clear_canvas()
+    g2d.draw_image("ghosts-goblins-bg.png", (backX,0), (0,0)) #sfondo 
+    g2d.draw_text(str(contaTick), (50,30), 30) #timer
     for a in arena.actors():
         if a.sprite() != None:
             g2d.draw_image("ghosts-goblins.png", a.pos(), a.sprite(), a.size())
-        else:
-            pass  # g2d.draw_rect(a.pos(), a.size())
- 
-    if img ==True: 
-        g2d.draw_image("ending.webp", (0,0), (600,600))
+            
+    #spawn zoombie ogni 50 tick
+    z= [(400,180), (200,180), (500,180), (100,180), (10,180)]
+    if contaTick%20==0:
+        arena.spawn(Zombie(z[i], contaTick)) #spawn zombie che vanno da destra a sinistra
+        if i<len(z)-1 : 
+            i+=1
+        else: 
+            i=0
+
     
-    arena.tick(g2d.current_keys())
+    arena.tick(k)       
+
+
     
 def main():
     #ARENA
     global arena
-    
+    global contaTick, i 
     arena = Arena((600, 260)) #dim arena
     g2d.init_canvas(arena.size()) #creo canvas
     
-    #ZOMBIE
-    arena.spawn(Zombie((60,180))) #spawn zombie che vanno da destra a sinistra
-     
     #ARTHUR
     arena.spawn(Arthur((0, 150)))
 
-    arena.tick(g2d.current_keys())
+    #ZOMBIE spawn nel tick
+        
+     
     
-    #background
     
     g2d.main_loop(tick)
 
