@@ -62,10 +62,14 @@ class Arthur(Actor):
                     self._touch = True
                 else:
                     self._touch = False
+                if self._touch == False: 
+                    arena.kill(Arthur)
+                    g2d.close_canvas()
             if isinstance(other, Platform):
                 self._y = 100 #se tocco la platform salendo le scale poi arthur cammina su y=100
             if isinstance(other, Eyeball): 
                 arena.kill(self) #se arthur tocca un occhio muore
+                g2d.close_canvas()
             if isinstance(other,Plant):
                 self._y-=10
 
@@ -323,10 +327,9 @@ class Plant(Actor):
         # aggiorna posizione a schermo derivata dalla posizione nel mondo
         
         self._GBack= self._x + backX
-        probabilita = random.randrange(0,2000)
+        probabilita = random.randrange(0,20)
         if probabilita == 1:
-            sparaeye=True
-            
+            arena.spawn(Eyeball((self._GBack,self._y), contaTick))
             
 
     def pos(self) -> Point:
@@ -396,6 +399,8 @@ def tick():
         arena.spawn(Zombie((zX,210), contaTick, d)) #spawn zombie che vanno da destra a sinistra    
     #passo per parametro: (x casuale,y), secondo in cui viene generato, destra/sinistra
     
+def Finale():
+    g2d.draw_text("the end", (300,300), 100)
 def main():
     #var globali
     global arena
