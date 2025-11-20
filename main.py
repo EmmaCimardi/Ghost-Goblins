@@ -47,6 +47,8 @@ class Arthur(Actor):
         self._animation_speed = 4
         self._animation_counter = 0
         
+        #self._passati =0 #per la torcia, guarda che siano passati 10 tick tra una e l'altra
+        
 
     def move(self, arena):
         global scala1, scala2, scala3, fineScala, lago1, backX, x_arthur
@@ -97,9 +99,11 @@ class Arthur(Actor):
             self._saltato = True
             
         if "Enter" in keys: #premendo enter posso sparare
+           # if contaTick-10 == self._saltato: #OGNI 10 TICK UNA TORCIA
             if self._arrow==1: #se arthur va a destra (arrowRIght) spawn 20 pixel dopo di lui
                 arena.spawn(Torch((self._x+20, self._y), contaTick)) 
             elif self._arrow==2: arena.spawn(Torch((self._x-20, self._y), contaTick)) #se arthur va a sinistra (arrow left) spawn 20 pixel prima di lui
+               # self._passati=contaTick
 
         # Gravità 
         self._vy += 0.5
@@ -289,7 +293,7 @@ class Flame(Actor):
         self._tc = tc #tick in cui è stata generata, lo uso per far spegnere dopo 30 tick
 
     def move(self, arena):
-        if contaTick - self._tc >= 60:
+        if contaTick - self._tc >= 60: #sparisce dopo 60 TICK
                 arena.kill(self)
        
     def pos(self) -> Point:
@@ -301,6 +305,48 @@ class Flame(Actor):
     def sprite(self) -> Point:
         return 116,429
     
+class Plant(Actor):
+    def __init__(self, pos ):
+        self._x, self._y = pos 
+        self._w, self._h = 17, 32
+       
+
+    def move(self, arena):
+        global contaTick
+        probabilita = random.randrange(0,200)
+        if probabilita==1:
+            arena.spawn(Eyeball((self._x,self._y), contaTick)) #spawn in momenti casuali di un eyeball
+       
+    def pos(self) -> Point:
+        return self._x, self._y
+
+    def size(self) -> Point:
+        return self._w, self._h
+
+    def sprite(self) -> Point:
+        return 637,207
+    
+class Eyeball(Actor):
+    def __init__(self, pos, tc):
+        self._x, self._y = pos 
+        self._w, self._h = 13, 13
+        self._tc = tc #tick in cui è stata generata, lo uso per far spegnere dopo 30 tick
+        self._speed=5
+        
+    def move(self, arena):
+        self._x -= self._speed #si sposta
+        
+        if contaTick - self._tc >= 60: #sparisce dopo 40 TICK
+                arena.kill(self)
+       
+    def pos(self) -> Point:
+        return self._x, self._y
+
+    def size(self) -> Point:
+        return self._w, self._h
+
+    def sprite(self) -> Point:
+        return 549,216
     
 #TICK FUNZIONE
 backX=0 #movimento dello sfondo
@@ -332,6 +378,13 @@ def tick():
         arena.spawn(Zombie((zX,210), contaTick, d)) #spawn zombie che vanno da destra a sinistra    
     #passo per parametro: (x casuale,y), secondo in cui viene generato, destra/sinistra
     
+    #spawn PLANT CASUALE
+    probPiante = random.randrange(0,20)
+    X= random.randrange(60,600)
+    if probPiante == 1:
+        arena.spawn(Plant((X,180)))
+    
+    
 def main():
     #var globali
     global arena
@@ -351,6 +404,10 @@ def main():
     arena.spawn(Platform((738, 121), 173,16))
     arena.spawn(Platform((927, 123), 148,16))
     arena.spawn(Platform((1088, 125), 47,16))
+    
+    #torch e flame spawn nelle funzioni
+    #Piante spawn nel tick
+    #eywball spawn in piante
     
      
     
