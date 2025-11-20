@@ -50,7 +50,7 @@ class Arthur(Actor):
 
     def move(self, arena):
         global scala1, scala2, scala3, fineScala, lago1, backX, x_arthur
-       
+        #arena.spawn(Torch((self._x+20, self._y)))
         for other in arena.collisions():
             if isinstance(other, Zombie):
                 if self._touch == False:
@@ -96,8 +96,10 @@ class Arthur(Actor):
             self._arrow = 3
             self._saltato = True
             
-        if "Space" in keys:
-            arena.spawn(Torch(self._x+10, self._y))
+        if "Enter" in keys: #premendo enter posso sparare
+            if self._arrow==1: #se arthur va a destra (arrowRIght) spawn 20 pixel dopo di lui
+                arena.spawn(Torch((self._x+20, self._y), contaTick)) 
+            elif self._arrow==2: arena.spawn(Torch((self._x-20, self._y), contaTick)) #se arthur va a sinistra (arrow left) spawn 20 pixel prima di lui
 
         # Gravità 
         self._vy += 0.5
@@ -183,10 +185,17 @@ class Zombie(Actor):
              
         #sorge dal terreno, 210-180=30/10=3, in 3 tick sale
     
-        if self._y> 180:
+        for other in arena.collisions():
+                if isinstance(other, Torch):
+                    arena.kill(other) #se tocca uno zombie questo muore 
+                    arena.kill(self) #lo zombie se tocca unatorcia MUORE e "muore" anche la tocia (colpisce solo uno zombie)
+                elif isinstance(other,Flame):
+                    arena.kill(self) #se zombie tocca fuoco
+        
+        if self._y> 180: #lo faccio arrivare da sotto terra, per 3 tick si farà 210-10 fino ad arrivare a 180
             self._y -= 10
             
-        if self._y <= 180:
+        if self._y <= 180: #atrivatoo a y=180 allora inizia a camminare ad altezza terreno
             
             if x_arthur > self._x: #se la posizione di arthur>di zombi allora si gira a destra "verso arthr"
                 self._dx = self._speed #d
@@ -201,7 +210,8 @@ class Zombie(Actor):
             elif self._x + self._w > arena_w:
                 self._x = arena_w - self._w
                 self._x = -self._speed
-            #farlo morire dopo 100 tick
+                
+            #farlo morire dopo 50 tick
             #contatick è quello "aggiornato" mentre self._ct è il secondo in cui è stato generato lo zombie
             if contaTick - self._ct >= 50:
                 self._die = True #cambio immagine e metto zombie che va a terra
@@ -237,22 +247,31 @@ class Platform(Actor):
         return None
 
 class Torch(Actor):
-    def __init__(self, pos):
+    
+    def __init__(self, pos, tc):
         self._x, self._y = pos 
-        self._w, self._h = 15, 15
+        self._w, self._h = 19, 16
         self._speed = 4
-        self._dx, self._dy = self._speed, self._speed
+        self._dx = self._speed
+        self._tc = tc #tick in cui è stata generata, lo uso per far cadere la torcia dopo 20 tick
+        self._spawn=False #ho spawnato la flame??? solo UNA oer torciaa
 
-    def move(self, arena: Arena):
-        self._x += self._dx #ad ogni tick la fiaccola va
-        for other in arena.collisions():
-            if isinstance(other, Zombie):
-                arena.kill(other) #se tocca uno zombie questo muore 
-                arena.kill(self)
+    def move(self, arena):
+       
+        global contaTick #serve per dire quando si è accesa la fiamma
+        #se la x è minore di quella di arthur deve sparare a sinistra
+        if self._x-backX<=x_arthur:  
+            self._x -= self._speed
+        else:
+            self._x += self._speed #se la x è maggiore di quella di arthur deve sparare a dest
+        if contaTick - self._tc >= 50:
+            self._y+=30
+            if self._spawn==False:
+                arena.spawn(Flame((self._x,180), contaTick) ) #se tocca a terra deve appiccare un "fuoco"/flame
+                self._spawn=True
+               
+
         
-        
-        #if self._y + self._dy > arena_h - self._h:
-            #flame spawn
     def pos(self) -> Point:
         return self._x, self._y
 
@@ -260,10 +279,28 @@ class Torch(Actor):
         return self._w, self._h
 
     def sprite(self) -> Point:
-        return 130,334
+        return 95,336
 
 
-#class Flame(Actor): 
+class Flame(Actor): 
+    def __init__(self, pos, tc):
+        self._x, self._y = pos 
+        self._w, self._h = 34, 30
+        self._tc = tc #tick in cui è stata generata, lo uso per far spegnere dopo 30 tick
+
+    def move(self, arena):
+        if contaTick - self._tc >= 60:
+                arena.kill(self)
+       
+    def pos(self) -> Point:
+        return self._x, self._y
+
+    def size(self) -> Point:
+        return self._w, self._h
+
+    def sprite(self) -> Point:
+        return 116,429
+    
     
 #TICK FUNZIONE
 backX=0 #movimento dello sfondo
@@ -277,12 +314,12 @@ def tick():
     g2d.clear_canvas()
     g2d.draw_image("ghosts-goblins-bg.png", (backX,0), (0,0)) #sfondo 
     g2d.draw_text(str(contaTick), (50,30), 30) #timer
-    
+    arena.tick(k)    
     for a in arena.actors():  #genero actor
         if a.sprite() != None:
             g2d.draw_image("ghosts-goblins.png", a.pos(), a.sprite(), a.size())
      
-    arena.tick(k)        
+        
     #spawn zoombie 
     zX= random.randrange(60,600) #la x di zombie è casuale [60,550[
     d = random.choice([True, False])#destra(true) o sinistra(false)
