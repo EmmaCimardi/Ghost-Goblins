@@ -6,6 +6,7 @@ global contaTick, x_arthur
 global scala1, scala2, scala3
 global lago1
 global fineScala
+global sparaeye
 #inizializzazione variabili globali
 #valore x sullo sfondo(.png) delle varie cose:
 scala1=715
@@ -13,6 +14,7 @@ scala2=912
 scala3=1070
 lago1=1164 
 fineScala=1131
+sparaeye=False
 #contatori:
 contaTick=0 #timer
 x_arthur=0 # valore di x aggiornato  (arthur)
@@ -61,6 +63,8 @@ class Arthur(Actor):
                     self._touch = False
             if isinstance(other, Platform):
                 self._y = 100 #se tocco la platform salendo le scale poi arthur cammina su y=100
+            if isinstance(other, Eyeball): 
+                arena.kill(self) #se arthur tocca un occhio muore
         keys = g2d.current_keys()
 
         
@@ -306,47 +310,63 @@ class Flame(Actor):
         return 116,429
     
 class Plant(Actor):
-    def __init__(self, pos ):
-        self._x, self._y = pos 
+    def __init__(self, pos):
+        global backX 
+        
+        self._x, self._y = pos #self._x= pixel del bg
+        self._GBack= self._x+ backX #quindi faccio un nuovo self._x con posizione nel bg+backX(sfondo)
+        #self_x è la pos nel bg quindi faccio +backK per avere quella canvas
         self._w, self._h = 17, 32
-       
-
+        
     def move(self, arena):
-        global contaTick
-        probabilita = random.randrange(0,200)
-        if probabilita==1:
-            arena.spawn(Eyeball((self._x,self._y), contaTick)) #spawn in momenti casuali di un eyeball
-       
+        global contaTick, backX,sparaeye
+        # aggiorna posizione a schermo derivata dalla posizione nel mondo
+        
+        self._GBack= self._x + backX
+        probabilita = random.randrange(0,2000)
+        if probabilita == 1:
+            sparaeye=True
+            
+            
+
     def pos(self) -> Point:
-        return self._x, self._y
+        
+        return self._GBack, self._y
 
     def size(self) -> Point:
         return self._w, self._h
 
     def sprite(self) -> Point:
         return 637,207
+
     
 class Eyeball(Actor):
     def __init__(self, pos, tc):
-        self._x, self._y = pos 
+        global backX
+        self._x, self._y = pos
+        self._GBack= self._x+ backX #stessa cosa di sopra
         self._w, self._h = 13, 13
-        self._tc = tc #tick in cui è stata generata, lo uso per far spegnere dopo 30 tick
-        self._speed=5
-        
+        self._tc = tc
+        self._speed = 5
+
     def move(self, arena):
-        self._x -= self._speed #si sposta
-        
-        if contaTick - self._tc >= 60: #sparisce dopo 40 TICK
-                arena.kill(self)
+        global contaTick, backX
        
+        self._GBack += self._speed
+
+        # se il tempo è passato, sparisci
+        if contaTick - self._tc >= 60:
+            arena.kill(self)
+
     def pos(self) -> Point:
-        return self._x, self._y
+        return self._GBack, self._y
 
     def size(self) -> Point:
         return self._w, self._h
 
     def sprite(self) -> Point:
         return 549,216
+
     
 #TICK FUNZIONE
 backX=0 #movimento dello sfondo
@@ -378,13 +398,6 @@ def tick():
         arena.spawn(Zombie((zX,210), contaTick, d)) #spawn zombie che vanno da destra a sinistra    
     #passo per parametro: (x casuale,y), secondo in cui viene generato, destra/sinistra
     
-    #spawn PLANT CASUALE
-    probPiante = random.randrange(0,20)
-    X= random.randrange(60,600)
-    if probPiante == 1:
-        arena.spawn(Plant((X,180)))
-    
-    
 def main():
     #var globali
     global arena
@@ -406,9 +419,12 @@ def main():
     arena.spawn(Platform((1088, 125), 47,16))
     
     #torch e flame spawn nelle funzioni
-    #Piante spawn nel tick
+    #Piante spawn
+    for i in range(20): #ne metto 20 in tutto il mondo
+        X = random.randrange(0, 3588) #dim del bg
+        arena.spawn(Plant((X, 180)))
     #eywball spawn in piante
-    
+
      
     
     
