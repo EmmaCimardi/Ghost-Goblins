@@ -20,9 +20,6 @@ x_arthur=0 # valore di x aggiornato  (arthur)
 sheet = "ghosts-goblins.png"
 
 
-sheet = "ghosts-goblins.png"
-
-
 # coordinate della corsa (x, y, w, h)
 frames_run = [
     (39, 43, 23, 30),
@@ -58,22 +55,22 @@ class Arthur(Actor):
         global scala1, scala2, scala3, fineScala, lago1, backX, x_arthur
         #arena.spawn(Torch((self._x+20, self._y)))
         keys = g2d.current_keys()
-        for other in arena.collisions():
-            if isinstance(other, Zombie):
-                if self._touch == False:
-                    self._touch = True
-                else:
-                    self._touch = False
-                if self._touch == False: 
+       # for other in arena.collisions():
+          #  if isinstance(other, Zombie):
+             #   if self._touch == False:
+              #      self._touch = True
+               # else:
+                #    self._touch = False
+                #if self._touch == False: 
                     #arena.kill(Arthur)
-                    g2d.close_canvas()
-            if isinstance(other, Platform):
-                self._y = 100 #se tocco la platform salendo le scale poi arthur cammina su y=100
-            if isinstance(other, Eyeball): 
+                    #g2d.close_canvas()
+            #if isinstance(other, Platform):
+             #   self._y = 100 #se tocco la platform salendo le scale poi arthur cammina su y=100
+            #if isinstance(other, Eyeball): 
                 #arena.kill(self) #se arthur tocca un occhio muore
-                g2d.close_canvas()
-            if isinstance(other,Plant):
-                self._y-=10
+             #   g2d.close_canvas()
+            #if isinstance(other,Plant):
+             #   self._y-=10
 
         
         moved = False
