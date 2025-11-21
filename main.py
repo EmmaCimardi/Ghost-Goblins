@@ -244,8 +244,6 @@ class Arthur(Actor):
                 else:  # sinistra
                     self._w, self._h = 29, 31 
                     return 482, 43
-                
-
         else:
             # se ha toccato nemici
             #cliccato e va a destra 
@@ -379,27 +377,15 @@ class Flame(Actor):
 class Tombe(Actor):
     def __init__(self, pos):
         global backX 
-        self._x, self._y = pos #self._x= pixel del bg
-        self._GBack= self._x+ backX #quindi faccio un nuovo self._x con posizione nel bg+backX(sfondo)
-        #self_x è la pos nel bg quindi faccio +backK per avere quella canvas
-        self._w, self._h = 18, 16
-
-    def move(self, arena):
-        global backX
-        
-        self._GBack = self._x + backX   # aggiorna posizione a schermo
-    
-    def pos(self) -> Point:
-        return self._GBack, self._y
-
-    def __init__(self, pos, w, h):
-        self._x, self._y = pos
-        self._w, self._h = w, h
+        self._x, self._y = pos #come in pianta
+        self._GBack= self._x+ backX 
+        self._w, self._h = 17, 16
                 
     def move(self, arena):
-        self._x=self._x
+        
+        self._GBack= self._x + backX
     def pos(self) -> Point:
-        return self._x, self._y
+        return self._GBack, self._y
 
     def size(self) -> Point:
         return self._w, self._h
@@ -603,7 +589,6 @@ def main():
     arena.spawn(Lago((2448,205),33,49))
     arena.spawn(Lago((2705,205),32,55))
     
-    g2d.main_loop(tick)
 
     #pos tombe 
     tombe_pos = [
@@ -620,8 +605,8 @@ def main():
         (865, 106), 
         (961, 108)   
     ]
-    
+
     for pos in tombe_pos:
         arena.spawn(Tombe(pos))
-
+    g2d.main_loop(tick)
 main()
