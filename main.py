@@ -88,7 +88,6 @@ class Arthur(Actor):
              #   g2d.close_canvas()
             #if isinstance(other,Plant):
              #   self._y-=10
-
         
         moved = False
         if "ArrowRight" in keys:  # freccia destra
