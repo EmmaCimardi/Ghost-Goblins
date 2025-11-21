@@ -36,14 +36,30 @@ frames_cors_s = [
 ]
 
 frames_salto_d = [
-    (141, 27, 36, 31),
+    (143, 27, 36, 31),
     (128, 27, 32, 31)
 ]
 
 frames_salto_s = [
-    (325, 28, 34, 29),
-    (301, 27 , 32, 29)
+    (328, 28, 34, 29),
+    (305, 27 , 32, 29)
 ]
+#NUDO
+frames_cors_sp_d = [
+    (37, 74, 27, 29),
+    (66, 76, 18, 30),
+    (89, 76, 18, 30),
+    (108, 77, 26, 25)
+]
+
+frames_cors_sp_s = [
+    (448, 74, 27, 28),
+    (425, 76, 21, 31),
+    (404, 75, 20, 31),
+    (376, 74, 28, 29)
+]
+
+
 
 class Arthur(Actor):
     
@@ -62,6 +78,8 @@ class Arthur(Actor):
         self._saltato = False
         
         self._frame = 0
+        self._frame_salto = 0
+        self._frame_sp = 0
         self._animation_speed = 4
         self._animation_counter = 0
         
@@ -72,15 +90,15 @@ class Arthur(Actor):
         global scala1, scala2, scala3, fineScala, lago1, backX, x_arthur
         #arena.spawn(Torch((self._x+20, self._y)))
         keys = g2d.current_keys()
-       # for other in arena.collisions():
-          #  if isinstance(other, Zombie):
-             #   if self._touch == False:
-              #      self._touch = True
-               # else:
-                #    self._touch = False
-                #if self._touch == False: 
+        for other in arena.collisions():
+          if isinstance(other, Zombie):
+            if self._touch == False:
+               self._touch = True
+            else:
+                if self._touch == False: 
                     #arena.kill(Arthur)
-                    #g2d.close_canvas()
+                    g2d.close_canvas()
+                    self._touch = False
             #if isinstance(other, Platform):
              #   self._y = 100 #se tocco la platform salendo le scale poi arthur cammina su y=100
             #if isinstance(other, Eyeball): 
@@ -113,7 +131,8 @@ class Arthur(Actor):
             self._animation_counter += 1
             if self._animation_counter >= self._animation_speed:
                 self._frame = (self._frame + 1) % len(frames_cors_d)
-                self._frame2 = (self._frame + 1) % len(frames_salto_d)
+                self._frame_salto = (self._frame_salto + 1) % len(frames_salto_d)
+                self._frame_sp = (self._frame_sp + 1) % len(frames_cors_sp_d)
                 self._animation_counter = 0
 
         # salto
@@ -194,11 +213,15 @@ class Arthur(Actor):
             elif self._jumping:
                 #salto a destra 
                 if self._arrow == 1:
-                    self._w, self._h = 36, 31   
-                    return 141, 27   
+                    sx, sy, w, h = frames_salto_d[self._frame_salto]
+                    # aggiorno dim 
+                    self._w, self._h = w, h
+                    return sx, sy  
                 else:
-                    self._w, self._h = 38, 31    
-                    return 332, 27
+                    sx, sy, w, h = frames_salto_s[self._frame_salto]
+                    # aggiorno dim 
+                    self._w, self._h = w, h
+                    return sx, sy
             # se è fermo
             else:
                 if self._arrow == 1:  # destra
@@ -207,9 +230,40 @@ class Arthur(Actor):
                 else:  # sinistra
                     self._w, self._h = 29, 31 
                     return 482, 43
+                
+
         else:
             # se ha toccato nemici
-            return 64, 75
+            #cliccato e va a destra 
+                if self._arrow == 1:
+                    sx, sy, w, h = frames_cors_sp_d[self._frame_sp]
+                    # aggiorno dim 
+                    self._w, self._h = w, h
+                    return sx, sy
+                 #cliccato e va a sinistra 
+                if self._arrow == 2:
+                    sx, sy, w, h = frames_cors_sp_s[self._frame_sp]
+                    # aggiorno dim 
+                    self._w, self._h = w, h
+                    return sx, sy
+            # salto
+                elif self._jumping:
+                    #salto a destra 
+                    if self._arrow == 1:
+                        self._w, self._h = 32, 30   
+                        return 143, 59   
+                    else:
+                        self._w, self._h = 35, 31    
+                        return 335, 59
+                # se è fermo
+                else:
+                    if self._arrow == 1:  # destra
+                        self._w, self._h = 21, 31 
+                        return 5, 75  
+                    else:  # sinistra
+                        self._w, self._h = 19, 32 
+                        return 436, 75
+
     
 class Zombie(Actor):
     
@@ -489,6 +543,8 @@ class Eyeball(Actor):
 
     def sprite(self) -> Point:
         return 549,216
+    
+
     
 #TICK FUNZIONE
 backX=0 #movimento dello sfondo
