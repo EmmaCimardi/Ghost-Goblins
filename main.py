@@ -7,6 +7,7 @@ global scala1, scala2, scala3
 global lago1
 global fineScala
 global sparaeye
+global inizioGioco
 #inizializzazione variabili globali
 #valore x sullo sfondo(.png) delle varie cose:
 scala1=715
@@ -18,6 +19,8 @@ fineScala=1131
 contaTick=0 #timer
 x_arthur=0 # valore di x aggiornato  (arthur)
 sheet = "ghosts-goblins.png"
+
+inizioGioco=False
 
 
 # coordinate della corsa (x, y, w, h)
@@ -79,7 +82,7 @@ class Arthur(Actor):
             self._click = True
             moved = True
             if self._x > 50 and backX > -2900:
-                backX -= 2
+                backX -= 5
 
         elif "ArrowLeft" in keys:  # freccia sinistra
             self._x -= self._speed
@@ -87,7 +90,7 @@ class Arthur(Actor):
             self._click = True
             moved = True
             if self._x < 50 and backX < 0:
-                backX += 2
+                backX += 5
         else:
             self._click = False
 
@@ -464,8 +467,19 @@ backX=0 #movimento dello sfondo
 def tick():
     #funzioni globalo
     global contaTick
-    global backX, i, x_arthur
+    global backX, i, x_arthur, inizioGioco
+    keys = g2d.current_keys()
+    
+    if not inizioGioco:  # schermata iniziale
+        g2d.clear_canvas()
+        g2d.draw_image("Logo.png", (50, 50), (0, 0))  
+        g2d.draw_text("Premi ENTER per iniziare", (180,220), 20)
+        if "Enter" in keys:
+            inizioGioco = True
+        return
 
+
+    
     contaTick += 1 #secondi
     k = g2d.current_keys() #array di tasti dalla keynoard
     g2d.clear_canvas()
@@ -475,12 +489,11 @@ def tick():
     for a in arena.actors():  #genero actor
         if a.sprite() != None:
             g2d.draw_image("ghosts-goblins.png", a.pos(), a.sprite(), a.size())
-     
-        
+       
     #spawn zoombie 
     zX= random.randrange(60,600) #la x di zombie è casuale [60,550[
     d = random.choice([True, False])#destra(true) o sinistra(false)
-    prob = random.randrange(0,20) #ho una probabilita su 1500 che nasca uno zombie (metto 1/10 per vederli)
+    prob = random.randrange(0,500) #ho una probabilita su 1500 che nasca uno zombie (metto 1/10 per vederli)
     distanza= x_arthur - zX #devo calcolare la distanza tra arthur e gli zombie, se lo zombie è vicino di 200
     if distanza <=0 : 
         distanza = distanza*(-1) #distanza deve essere positiva, minore o maggiore di 200
@@ -496,7 +509,7 @@ def main():
     
     #arena
     arena = Arena((600, 260)) #dim arena
-    g2d.init_canvas(arena.size()) #creo canvas
+    g2d.init_canvas(arena.size(),2) #creo canvas
     
     #ARTHUR
     arena.spawn(Arthur((0, 180))) #spawn arthur sul terreno
@@ -511,7 +524,7 @@ def main():
     
     #torch e flame spawn nelle funzioni
     #Piante spawn
-    for i in range(20): #ne metto 20 in tutto il mondo
+    for i in range(10): #ne metto 20 in tutto il mondo
         X = random.randrange(0, 3588) #dim del bg
         arena.spawn(Plant((X, 180)))
     #eywball spawn in piante
