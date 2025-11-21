@@ -3,11 +3,10 @@ from actor import Actor, Point, Arena
 import random
 #dim background: 3588x327
 global contaTick, x_arthur
-global scala1, scala2, scala3
+global scala1, scala2, scala3, inizioGioco
 global lago1
 global fineScala
 global sparaeye
-global inizioGioco
 #inizializzazione variabili globali
 #valore x sullo sfondo(.png) delle varie cose:
 scala1=715
@@ -19,11 +18,9 @@ fineScala=1131
 contaTick=0 #timer
 x_arthur=0 # valore di x aggiornato  (arthur)
 sheet = "ghosts-goblins.png"
-fineGioco=False
 inizioGioco=False
 
 
-#COORDINATE PER FAR MUOVERE ARTHUR 
 # coordinate della corsa (x, y, w, h)
 frames_cors_d = [
     (39, 43, 23, 30),
@@ -63,6 +60,8 @@ frames_cors_sp_s = [
     (376, 74, 28, 29)
 ]
 
+
+
 class Arthur(Actor):
     
     def __init__(self, pos):
@@ -89,7 +88,7 @@ class Arthur(Actor):
         
 
     def move(self, arena):
-        global scala1, scala2, scala3, fineScala, lago1, backX, x_arthur, fineGioco
+        global scala1, scala2, scala3, fineScala, lago1, backX, x_arthur
         #arena.spawn(Torch((self._x+20, self._y)))
         keys = g2d.current_keys()
         for other in arena.collisions():
@@ -99,13 +98,12 @@ class Arthur(Actor):
             else:
                 if self._touch == False: 
                     #arena.kill(Arthur)
-                    fineGioco=True
+                    g2d.close_canvas()
                     self._touch = False
             #if isinstance(other, Platform):
              #   self._y = 100 #se tocco la platform salendo le scale poi arthur cammina su y=100
             #if isinstance(other, Eyeball): 
                 #arena.kill(self) #se arthur tocca un occhio muore
-                fineGioco=True
              #   g2d.close_canvas()
             if isinstance(other, Tombe):
                 # Se Arthur tocca una tomba, viene bloccato
@@ -125,7 +123,7 @@ class Arthur(Actor):
             self._click = True
             moved = True
             if self._x > 50 and backX > -2900:
-                backX -= 5
+                backX -= 2
 
         elif "ArrowLeft" in keys:  # freccia sinistra
             self._x -= self._speed
@@ -133,7 +131,7 @@ class Arthur(Actor):
             self._click = True
             moved = True
             if self._x < 50 and backX < 0:
-                backX += 5
+                backX += 2
         else:
             self._click = False
 
@@ -352,41 +350,6 @@ class Platform(Actor):
     def sprite(self) -> Point:
         return None
 
-class Torch(Actor):
-    
-    def __init__(self, pos, tc):
-        self._x, self._y = pos 
-        self._w, self._h = 19, 16
-        self._speed = 4
-        self._dx = self._speed
-        self._tc = tc #tick in cui è stata generata, lo uso per far cadere la torcia dopo 20 tick
-        self._spawn=False #ho spawnato la flame??? solo UNA oer torciaa
-
-    def move(self, arena):
-       
-        global contaTick #serve per dire quando si è accesa la fiamma
-        #se la x è minore di quella di arthur deve sparare a sinistra
-        if self._x-backX<=x_arthur:  
-            self._x -= self._speed
-        else:
-            self._x += self._speed #se la x è maggiore di quella di arthur deve sparare a dest
-        if contaTick - self._tc >= 50:
-            self._y+=30
-            if self._spawn==False:
-                arena.spawn(Flame((self._x,180), contaTick) ) #se tocca a terra deve appiccare un "fuoco"/flame
-                self._spawn=True
-               
-
-        
-    def pos(self) -> Point:
-        return self._x, self._y
-
-    def size(self) -> Point:
-        return self._w, self._h
-
-    def sprite(self) -> Point:
-        return 95,336
-
 class Flame(Actor): 
     def __init__(self, pos, tc):
         self._x, self._y = pos 
@@ -404,45 +367,7 @@ class Flame(Actor):
         return self._w, self._h
 
     def sprite(self) -> Point:
-        return 116,429
-    
-class Plant(Actor):
-    def __init__(self, pos):
-        global backX 
-        
-        self._x, self._y = pos #self._x= pixel del bg
-        self._GBack= self._x+ backX #quindi faccio un nuovo self._x con posizione nel bg+backX(sfondo)
-        #self_x è la pos nel bg quindi faccio +backK per avere quella canvas
-        self._w, self._h = 17, 32
-        
-    def move(self, arena):
-        global contaTick, backX,sparaeye
-        # aggiorna posizione a schermo derivata dalla posizione nel mondo
-        
-        self._GBack= self._x + backX
-        probabilita = random.randrange(0,20)
-        if probabilita == 1:
-            arena.spawn(Eyeball((self._GBack,self._y), contaTick))
-            
-
-    def pos(self) -> Point:
-        
-        return self._GBack, self._y
-
-    def __init__(self, pos, w, h):
-        self._x, self._y = pos
-        self._w, self._h = w, h
-                
-    def move(self, arena):
-        self._x=self._x
-    def pos(self) -> Point:
-        return self._x, self._y
-
-    def size(self) -> Point:
-        return self._w, self._h
-
-    def sprite(self) -> Point:
-        return None
+        return 116,429    
 
 class Tombe(Actor):
     def __init__(self, pos):
@@ -500,7 +425,6 @@ class Torch(Actor):
                 arena.spawn(Flame((self._x,180), contaTick) ) #se tocca a terra deve appiccare un "fuoco"/flame
                 self._spawn=True
                
-
         
     def pos(self) -> Point:
         return self._x, self._y
@@ -510,27 +434,7 @@ class Torch(Actor):
 
     def sprite(self) -> Point:
         return 95,336
-
-class Flame(Actor): 
-    def __init__(self, pos, tc):
-        self._x, self._y = pos 
-        self._w, self._h = 34, 30
-        self._tc = tc #tick in cui è stata generata, lo uso per far spegnere dopo 30 tick
-
-    def move(self, arena):
-        self._x= self._x + backX
-        if contaTick - self._tc >= 60: #sparisce dopo 60 TICK
-                arena.kill(self)
-       
-    def pos(self) -> Point:
-        return self._x, self._y
-
-    def size(self) -> Point:
-        return self._w, self._h
-
-    def sprite(self) -> Point:
-        return 116,429
-    
+  
 class Plant(Actor):
     def __init__(self, pos):
         global backX 
@@ -586,15 +490,15 @@ class Eyeball(Actor):
 
     def sprite(self) -> Point:
         return 549,216
-      
+       
 #TICK FUNZIONE
 backX=0 #movimento dello sfondo
 def tick():
     #funzioni globalo
     global contaTick
-    global backX, i, x_arthur, inizioGioco, fineGioco
-    keys = g2d.current_keys()
-    
+    global backX, i, x_arthur, inizioGioco
+
+    keys =  g2d.current_keys() #array di tasti dalla keynoard
     if not inizioGioco:  # schermata iniziale
         g2d.clear_canvas("black")
         g2d.draw_image("logo2.jpg", (120,0), (0,0))
@@ -603,15 +507,6 @@ def tick():
         if "Enter" in keys:
             inizioGioco = True
         return
-    if fineGioco == True:
-        g2d.draw_image("logo2.jpg", (120,0), (0,0))
-        g2d.draw_image("enter.png", (150,200), (0,0))
-        if "Enter" in keys:
-            inizioGioco = True
-            fineGioco=False
-            return
-        g2d.close_canvas()
-        
     contaTick += 1 #secondi
     k = g2d.current_keys() #array di tasti dalla keynoard
     g2d.clear_canvas()
@@ -621,11 +516,12 @@ def tick():
     for a in arena.actors():  #genero actor
         if a.sprite() != None:
             g2d.draw_image("ghosts-goblins.png", a.pos(), a.sprite(), a.size())
-       
+     
+        
     #spawn zoombie 
     zX= random.randrange(60,600) #la x di zombie è casuale [60,550[
     d = random.choice([True, False])#destra(true) o sinistra(false)
-    prob = random.randrange(0,500) #ho una probabilita su 1500 che nasca uno zombie (metto 1/10 per vederli)
+    prob = random.randrange(0,20) #ho una probabilita su 1500 che nasca uno zombie (metto 1/10 per vederli)
     distanza= x_arthur - zX #devo calcolare la distanza tra arthur e gli zombie, se lo zombie è vicino di 200
     if distanza <=0 : 
         distanza = distanza*(-1) #distanza deve essere positiva, minore o maggiore di 200
@@ -656,7 +552,7 @@ def main():
     
     #torch e flame spawn nelle funzioni
     #Piante spawn
-    for i in range(10): #ne metto 20 in tutto il mondo
+    for i in range(20): #ne metto 20 in tutto il mondo
         X = random.randrange(0, 3588) #dim del bg
         arena.spawn(Plant((X, 180)))
     #eywball spawn in piante
