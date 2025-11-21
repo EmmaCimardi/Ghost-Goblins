@@ -19,10 +19,11 @@ fineScala=1131
 contaTick=0 #timer
 x_arthur=0 # valore di x aggiornato  (arthur)
 sheet = "ghosts-goblins.png"
-
+fineGioco=False
 inizioGioco=False
 
 
+#COORDINATE PER FAR MUOVERE ARTHUR 
 # coordinate della corsa (x, y, w, h)
 frames_cors_d = [
     (39, 43, 23, 30),
@@ -39,15 +40,15 @@ frames_cors_s = [
 ]
 
 frames_salto_d = [
-    (143, 27, 36, 31),
-    (128, 27, 32, 31)
+    (143, 28, 34, 29),
+    (181, 30, 27, 26)
 ]
 
 frames_salto_s = [
-    (328, 28, 34, 29),
-    (305, 27 , 32, 29)
+    (334, 29, 36, 29),
+    (300, 28 , 34, 27)
 ]
-#NUDO
+#spoglio
 frames_cors_sp_d = [
     (37, 74, 27, 29),
     (66, 76, 18, 30),
@@ -88,7 +89,7 @@ class Arthur(Actor):
         
 
     def move(self, arena):
-        global scala1, scala2, scala3, fineScala, lago1, backX, x_arthur
+        global scala1, scala2, scala3, fineScala, lago1, backX, x_arthur, fineGioco
         #arena.spawn(Torch((self._x+20, self._y)))
         keys = g2d.current_keys()
         for other in arena.collisions():
@@ -98,12 +99,13 @@ class Arthur(Actor):
             else:
                 if self._touch == False: 
                     #arena.kill(Arthur)
-                    g2d.close_canvas()
+                    fineGioco=True
                     self._touch = False
             #if isinstance(other, Platform):
              #   self._y = 100 #se tocco la platform salendo le scale poi arthur cammina su y=100
             #if isinstance(other, Eyeball): 
                 #arena.kill(self) #se arthur tocca un occhio muore
+                fineGioco=True
              #   g2d.close_canvas()
             #if isinstance(other,Plant):
              #   self._y-=10
@@ -550,7 +552,7 @@ backX=0 #movimento dello sfondo
 def tick():
     #funzioni globalo
     global contaTick
-    global backX, i, x_arthur, inizioGioco
+    global backX, i, x_arthur, inizioGioco, fineGioco
     keys = g2d.current_keys()
     
     if not inizioGioco:  # schermata iniziale
@@ -561,7 +563,15 @@ def tick():
         if "Enter" in keys:
             inizioGioco = True
         return
-    
+    if fineGioco == True:
+        g2d.draw_image("logo2.jpg", (120,0), (0,0))
+        g2d.draw_image("enter.png", (150,200), (0,0))
+        if "Enter" in keys:
+            inizioGioco = True
+            fineGioco=False
+            return
+        g2d.close_canvas()
+        
     contaTick += 1 #secondi
     k = g2d.current_keys() #array di tasti dalla keynoard
     g2d.clear_canvas()
