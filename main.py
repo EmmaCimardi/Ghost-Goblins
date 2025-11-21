@@ -92,21 +92,23 @@ class Arthur(Actor):
         #arena.spawn(Torch((self._x+20, self._y)))
         keys = g2d.current_keys()
         for other in arena.collisions():
-          if isinstance(other, Zombie):
-            if self._touch == False:
-               self._touch = True
-            else:
-                if self._touch == False: 
-                    #arena.kill(Arthur)
-                    g2d.close_canvas()
-                    self._touch = False
-            #if isinstance(other, Platform):
+            if isinstance(other, Zombie):
+                if self._touch == False:
+                    self._touch = True
+                else:
+                    if self._touch == False: 
+                        #arena.kill(Arthur)
+                        g2d.close_canvas()
+                        self._touch = False
+           # if isinstance(other, Platform):
              #   self._y = 100 #se tocco la platform salendo le scale poi arthur cammina su y=100
             #if isinstance(other, Eyeball): 
                 #arena.kill(self) #se arthur tocca un occhio muore
              #   g2d.close_canvas()
             #if isinstance(other,Plant):
              #   self._y-=10
+            if isinstance(other,Lago):
+                arena.kill(self)
         
         moved = False
         if "ArrowRight" in keys:  # freccia destra
@@ -115,7 +117,7 @@ class Arthur(Actor):
             self._click = True
             moved = True
             if self._x > 50 and backX > -2900:
-                backX -= 2
+                backX -= 7
 
         elif "ArrowLeft" in keys:  # freccia sinistra
             self._x -= self._speed
@@ -123,7 +125,7 @@ class Arthur(Actor):
             self._click = True
             moved = True
             if self._x < 50 and backX < 0:
-                backX += 2
+                backX += 7
         else:
             self._click = False
 
@@ -450,7 +452,27 @@ class Eyeball(Actor):
 
     def sprite(self) -> Point:
         return 549,216
-       
+ 
+class Lago(Actor):
+    def __init__(self, pos, w, h):
+        global backX 
+        self._x, self._y = pos #come in pianta
+        self._GBack= self._x+ backX 
+        self._w, self._h = w, h
+                
+    def move(self, arena):
+        
+        g2d.draw_rect((self._GBack,self._y),(self._w,self._h))
+        self._GBack= self._x + backX
+    def pos(self) -> Point:
+        return self._GBack, self._y
+
+    def size(self) -> Point:
+        return self._w, self._h
+
+    def sprite(self) -> Point:
+        return None
+          
 #TICK FUNZIONE
 backX=0 #movimento dello sfondo
 def tick():
@@ -516,6 +538,15 @@ def main():
         X = random.randrange(0, 3588) #dim del bg
         arena.spawn(Plant((X, 180)))
     #eywball spawn in piante
+    
+    #LAGO
+    
+    arena.spawn(Lago((1663,205),129,59))
+    arena.spawn(Lago((1955,205),30,49))
+    arena.spawn(Lago((2020,205),29,49))
+    arena.spawn(Lago((2448,205),33,49))
+    arena.spawn(Lago((2705,205),32,55))
+    
     g2d.main_loop(tick)
 
 main()
