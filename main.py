@@ -105,6 +105,14 @@ class Arthur(Actor):
             #if isinstance(other, Eyeball): 
                 #arena.kill(self) #se arthur tocca un occhio muore
              #   g2d.close_canvas()
+            if isinstance(other, Tombe):
+                # Se Arthur tocca una tomba, viene bloccato
+                if (self._x + self._w > other._GBack and self._x < other._GBack + other._w and self._y + self._h > other._y):
+                    # ferma il movimento orizzontale
+                    if self._x < other._GBack:  # viene da sinistra
+                        self._x = other._GBack - self._w
+                    else:  # viene da destra
+                        self._x = other._GBack + other._w
             #if isinstance(other,Plant):
              #   self._y-=10
             if isinstance(other,Lago):
@@ -362,6 +370,38 @@ class Flame(Actor):
 
     def sprite(self) -> Point:
         return 116,429    
+
+class Tombe(Actor):
+    def __init__(self, pos):
+        global backX 
+        self._x, self._y = pos #self._x= pixel del bg
+        self._GBack= self._x+ backX #quindi faccio un nuovo self._x con posizione nel bg+backX(sfondo)
+        #self_x è la pos nel bg quindi faccio +backK per avere quella canvas
+        self._w, self._h = 18, 16
+
+    def move(self, arena):
+        global backX
+        
+        self._GBack = self._x + backX   # aggiorna posizione a schermo
+    
+    def pos(self) -> Point:
+        return self._GBack, self._y
+
+    def __init__(self, pos, w, h):
+        self._x, self._y = pos
+        self._w, self._h = w, h
+                
+    def move(self, arena):
+        self._x=self._x
+    def pos(self) -> Point:
+        return self._x, self._y
+
+    def size(self) -> Point:
+        return self._w, self._h
+
+    def sprite(self) -> Point:
+        return None
+        
 
 class Torch(Actor):
     
