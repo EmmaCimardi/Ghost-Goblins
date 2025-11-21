@@ -14,7 +14,6 @@ scala2=912
 scala3=1070
 lago1=1164 
 fineScala=1131
-sparaeye=False
 #contatori:
 contaTick=0 #timer
 x_arthur=0 # valore di x aggiornato  (arthur)
@@ -63,12 +62,12 @@ class Arthur(Actor):
                 else:
                     self._touch = False
                 if self._touch == False: 
-                    arena.kill(Arthur)
+                    #arena.kill(Arthur)
                     g2d.close_canvas()
             if isinstance(other, Platform):
                 self._y = 100 #se tocco la platform salendo le scale poi arthur cammina su y=100
             if isinstance(other, Eyeball): 
-                arena.kill(self) #se arthur tocca un occhio muore
+                #arena.kill(self) #se arthur tocca un occhio muore
                 g2d.close_canvas()
             if isinstance(other,Plant):
                 self._y-=10
@@ -354,7 +353,7 @@ class Eyeball(Actor):
     def move(self, arena):
         global contaTick, backX
        
-        self._GBack += self._speed
+        self._GBack -= self._speed
 
         # se il tempo è passato, sparisci
         if contaTick - self._tc >= 60:
