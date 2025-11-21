@@ -3,7 +3,7 @@ from actor import Actor, Point, Arena
 import random
 #dim background: 3588x327
 global contaTick, x_arthur
-global scala1, scala2, scala3, inizioGioco
+global scala1, scala2, scala3, inizioGioco, fineGioco
 global lago1
 global fineScala
 global sparaeye
@@ -19,6 +19,7 @@ contaTick=0 #timer
 x_arthur=0 # valore di x aggiornato  (arthur)
 sheet = "ghosts-goblins.png"
 inizioGioco=False
+fineGioco=False
 
 
 # coordinate della corsa (x, y, w, h)
@@ -88,7 +89,7 @@ class Arthur(Actor):
         
 
     def move(self, arena):
-        global scala1, scala2, scala3, fineScala, lago1, backX, x_arthur
+        global scala1, scala2, scala3, fineScala, lago1, backX, x_arthur, fineGioco
         #arena.spawn(Torch((self._x+20, self._y)))
         keys = g2d.current_keys()
         for other in arena.collisions():
@@ -98,12 +99,13 @@ class Arthur(Actor):
                 else:
                     if self._touch == False: 
                         #arena.kill(Arthur)
-                        g2d.close_canvas()
+                        fineGioco=True
                         self._touch = False
            # if isinstance(other, Platform):
              #   self._y = 100 #se tocco la platform salendo le scale poi arthur cammina su y=100
             #if isinstance(other, Eyeball): 
                 #arena.kill(self) #se arthur tocca un occhio muore
+                #fineGioco=True
              #   g2d.close_canvas()
             if isinstance(other, Tombe):
                 # Se Arthur tocca una tomba, viene bloccato
@@ -117,6 +119,7 @@ class Arthur(Actor):
              #   self._y-=10
             if isinstance(other,Lago):
                 arena.kill(self)
+                fineGioco=True
         
         moved = False
         if "ArrowRight" in keys:  # freccia destra
@@ -355,15 +358,17 @@ class Platform(Actor):
 class Flame(Actor): 
     def __init__(self, pos, tc):
         self._x, self._y = pos 
+        self._GBack= self._x+ backX 
         self._w, self._h = 34, 30
         self._tc = tc #tick in cui è stata generata, lo uso per far spegnere dopo 30 tick
 
     def move(self, arena):
+        self._GBack= self._x+ backX 
         if contaTick - self._tc >= 60: #sparisce dopo 60 TICK
                 arena.kill(self)
        
     def pos(self) -> Point:
-        return self._x, self._y
+        return self._GBack, self._y
 
     def size(self) -> Point:
         return self._w, self._h
@@ -402,7 +407,6 @@ class Tombe(Actor):
     def sprite(self) -> Point:
         return None
         
-
 class Torch(Actor):
     
     def __init__(self, pos, tc):
@@ -502,7 +506,6 @@ class Lago(Actor):
                 
     def move(self, arena):
         
-        g2d.draw_rect((self._GBack,self._y),(self._w,self._h))
         self._GBack= self._x + backX
     def pos(self) -> Point:
         return self._GBack, self._y
@@ -518,17 +521,30 @@ backX=0 #movimento dello sfondo
 def tick():
     #funzioni globalo
     global contaTick
-    global backX, i, x_arthur, inizioGioco
+    global backX, i, x_arthur, inizioGioco, fineGioco
 
+    #START GAME
     keys =  g2d.current_keys() #array di tasti dalla keynoard
     if not inizioGioco:  # schermata iniziale
         g2d.clear_canvas("black")
         g2d.draw_image("logo2.jpg", (120,0), (0,0))
         g2d.draw_image("enter.png", (150,200), (0,0))
-        #g2d.draw_text("Premi ENTER per iniziare", (300,200), 20)
-        if "Enter" in keys:
+        if "Enter" in keys: #enter per iniziare
             inizioGioco = True
         return
+    #END GAME
+    if fineGioco:
+        g2d.clear_canvas("black")
+        g2d.draw_image("gameover.png", (120, 10), (0, 0))
+        g2d.draw_image("enter2.png", (160,200), (0,0))
+        
+
+        if "Enter" in keys:
+            g2d.close_canvas()
+
+        return
+    
+    #TICK NORMAL
     contaTick += 1 #secondi
     k = g2d.current_keys() #array di tasti dalla keynoard
     g2d.clear_canvas()
