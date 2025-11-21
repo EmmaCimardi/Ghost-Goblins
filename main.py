@@ -62,8 +62,6 @@ frames_cors_sp_s = [
     (376, 74, 28, 29)
 ]
 
-
-
 class Arthur(Actor):
     
     def __init__(self, pos):
@@ -266,7 +264,6 @@ class Arthur(Actor):
                     else:  # sinistra
                         self._w, self._h = 19, 32 
                         return 436, 75
-
     
 class Zombie(Actor):
     
@@ -479,6 +476,7 @@ class Flame(Actor):
         self._tc = tc #tick in cui è stata generata, lo uso per far spegnere dopo 30 tick
 
     def move(self, arena):
+        self._x= self._x + backX
         if contaTick - self._tc >= 60: #sparisce dopo 60 TICK
                 arena.kill(self)
        
@@ -546,9 +544,7 @@ class Eyeball(Actor):
 
     def sprite(self) -> Point:
         return 549,216
-    
-
-    
+      
 #TICK FUNZIONE
 backX=0 #movimento dello sfondo
 def tick():
@@ -558,14 +554,13 @@ def tick():
     keys = g2d.current_keys()
     
     if not inizioGioco:  # schermata iniziale
-        g2d.clear_canvas()
-        g2d.draw_image("Logo.png", (50, 50), (0, 0))  
-        g2d.draw_text("Premi ENTER per iniziare", (180,220), 20)
+        g2d.clear_canvas("black")
+        g2d.draw_image("logo2.jpg", (120,0), (0,0))
+        g2d.draw_image("enter.png", (150,200), (0,0))
+        #g2d.draw_text("Premi ENTER per iniziare", (300,200), 20)
         if "Enter" in keys:
             inizioGioco = True
         return
-
-
     
     contaTick += 1 #secondi
     k = g2d.current_keys() #array di tasti dalla keynoard
@@ -596,7 +591,7 @@ def main():
     
     #arena
     arena = Arena((600, 260)) #dim arena
-    g2d.init_canvas(arena.size(),2) #creo canvas
+    g2d.init_canvas(arena.size()) #creo canvas
     
     #ARTHUR
     arena.spawn(Arthur((0, 180))) #spawn arthur sul terreno
