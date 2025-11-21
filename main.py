@@ -108,7 +108,7 @@ class Arthur(Actor):
                 #fineGioco=True
              #   g2d.close_canvas()
             if isinstance(other, Tombe):
-                # Se Arthur tocca una tomba, viene bloccato
+                # Se tocca una tomba, viene bloccato
                 if (self._x + self._w > other._GBack and self._x < other._GBack + other._w and self._y + self._h > other._y):
                     # ferma il movimento orizzontale
                     if self._x < other._GBack:  # viene da sinistra
@@ -604,5 +604,24 @@ def main():
     arena.spawn(Lago((2705,205),32,55))
     
     g2d.main_loop(tick)
+
+    #pos tombe 
+    tombe_pos = [
+        (49, 186), 
+        (239, 186),  
+        (416, 188),  
+        (529, 186), 
+        (753, 186),
+        (960, 186),
+        (1105, 186),
+        (1266, 188),  
+        (1520, 186),  
+        (769, 108),   
+        (865, 106), 
+        (961, 108)   
+    ]
+    
+    for pos in tombe_pos:
+        arena.spawn(Tombe(pos))
 
 main()
