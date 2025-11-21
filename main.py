@@ -14,19 +14,12 @@ scala2=912
 scala3=1070
 lago1=1164 
 fineScala=1131
-<<<<<<< HEAD
 #contatori:
 contaTick=0 #timer
 x_arthur=0 # valore di x aggiornato  (arthur)
 sheet = "ghosts-goblins.png"
 
 
-=======
-sparaeye=False
-#contatori:
-contaTick=0 #timer
-x_arthur=0 # valore di x aggiornato  (arthur)
->>>>>>> 539af08135a9f6b6ecf600b9ec6115b1cd361641
 sheet = "ghosts-goblins.png"
 
 
@@ -72,20 +65,12 @@ class Arthur(Actor):
                 else:
                     self._touch = False
                 if self._touch == False: 
-<<<<<<< HEAD
                     #arena.kill(Arthur)
-=======
-                    arena.kill(Arthur)
->>>>>>> 539af08135a9f6b6ecf600b9ec6115b1cd361641
                     g2d.close_canvas()
             if isinstance(other, Platform):
                 self._y = 100 #se tocco la platform salendo le scale poi arthur cammina su y=100
             if isinstance(other, Eyeball): 
-<<<<<<< HEAD
                 #arena.kill(self) #se arthur tocca un occhio muore
-=======
-                arena.kill(self) #se arthur tocca un occhio muore
->>>>>>> 539af08135a9f6b6ecf600b9ec6115b1cd361641
                 g2d.close_canvas()
             if isinstance(other,Plant):
                 self._y-=10
