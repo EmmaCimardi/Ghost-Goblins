@@ -21,11 +21,28 @@ sheet = "ghosts-goblins.png"
 
 
 # coordinate della corsa (x, y, w, h)
-frames_run = [
+frames_cors_d = [
     (39, 43, 23, 30),
     (63, 41, 23, 33),
     (86, 41, 22, 34),
     (108, 42, 27, 31)
+]
+
+frames_cors_s = [
+    (449, 42, 24, 31),
+    (425, 41, 22, 33),
+    (404, 41, 22, 33),
+    (378, 41, 26, 33)
+]
+
+frames_salto_d = [
+    (141, 27, 36, 31),
+    (128, 27, 32, 31)
+]
+
+frames_salto_s = [
+    (325, 28, 34, 29),
+    (301, 27 , 32, 29)
 ]
 
 class Arthur(Actor):
@@ -96,7 +113,8 @@ class Arthur(Actor):
         if moved:
             self._animation_counter += 1
             if self._animation_counter >= self._animation_speed:
-                self._frame = (self._frame + 1) % len(frames_run)
+                self._frame = (self._frame + 1) % len(frames_cors_d)
+                self._frame2 = (self._frame + 1) % len(frames_salto_d)
                 self._animation_counter = 0
 
         # salto
@@ -161,14 +179,27 @@ class Arthur(Actor):
         if self._touch == False:
             # se si muove
             if self._click and not self._jumping:
-                sx, sy, w, h = frames_run[self._frame]
-                # aggiorno dim 
-                self._w, self._h = w, h
-                return sx, sy
+                #cliccato e va a destra 
+                if self._arrow == 1:
+                    sx, sy, w, h = frames_cors_d[self._frame]
+                    # aggiorno dim 
+                    self._w, self._h = w, h
+                    return sx, sy
+                 #cliccato e va a sinistra 
+                if self._arrow == 2:
+                    sx, sy, w, h = frames_cors_s[self._frame]
+                    # aggiorno dim 
+                    self._w, self._h = w, h
+                    return sx, sy
             # salto
             elif self._jumping:
-                self._w, self._h = 32, 32   #da cambiare 
-                return 148, 131  #da cambiare 
+                #salto a destra 
+                if self._arrow == 1:
+                    self._w, self._h = 36, 31   
+                    return 141, 27   
+                else:
+                    self._w, self._h = 38, 31    
+                    return 332, 27
             # se è fermo
             else:
                 if self._arrow == 1:  # destra
