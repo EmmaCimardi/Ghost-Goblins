@@ -399,8 +399,6 @@ def tick():
         arena.spawn(Zombie((zX,210), contaTick, d)) #spawn zombie che vanno da destra a sinistra    
     #passo per parametro: (x casuale,y), secondo in cui viene generato, destra/sinistra
     
-def Finale():
-    g2d.draw_text("the end", (300,300), 100)
 def main():
     #var globali
     global arena
@@ -430,3 +428,4 @@ def main():
     g2d.main_loop(tick)
 
 main()
+    
