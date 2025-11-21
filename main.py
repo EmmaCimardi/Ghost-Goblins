@@ -338,7 +338,6 @@ class Plant(Actor):
         
         return self._GBack, self._y
 
-<<<<<<< HEAD
     def __init__(self, pos, w, h):
         self._x, self._y = pos
         self._w, self._h = w, h
@@ -431,8 +430,6 @@ class Plant(Actor):
         
         return self._GBack, self._y
 
-=======
->>>>>>> 539af08135a9f6b6ecf600b9ec6115b1cd361641
     def size(self) -> Point:
         return self._w, self._h
 
@@ -451,11 +448,7 @@ class Eyeball(Actor):
     def move(self, arena):
         global contaTick, backX
        
-<<<<<<< HEAD
         self._GBack -= self._speed
-=======
-        self._GBack += self._speed
->>>>>>> 539af08135a9f6b6ecf600b9ec6115b1cd361641
 
         # se il tempo è passato, sparisci
         if contaTick - self._tc >= 60:
